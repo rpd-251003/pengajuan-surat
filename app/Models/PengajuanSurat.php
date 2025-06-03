@@ -25,4 +25,16 @@ class PengajuanSurat extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+        // Relasi ke mahasiswa (user)
+    public function mahasiswa()
+    {
+        return $this->belongsTo(User::class, 'mahasiswa_id');
+    }
+
+    // Relasi ke tahun akademik
+    public function tahunAkademik()
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
 }

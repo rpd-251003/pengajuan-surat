@@ -4,15 +4,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Referral</title>
+    <title>SI Pengajuan Surat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description"
-        content="Raihan is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
+        content="Sistem Pengajuan Surat Universitas Darma Persada untuk memudahkan proses administrasi dan pengelolaan surat bagi civitas akademika.">
     <meta name="keywords"
-        content="Raihan, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
-    <meta name="author" content="Raihan Permadi">
+        content="Universitas Darma Persada, Sistem Pengajuan Surat, Pengajuan Surat Online, Administrasi Universitas, Surat Resmi Kampus">
+    <meta name="author" content="Universitas Darma Persada">
 
 
 
@@ -28,8 +28,9 @@
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/material.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/css/style.css') }}" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/css/style-preset.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @stack('scripts')
+
 </head>
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
@@ -44,34 +45,17 @@
     <nav class="pc-sidebar">
         <div class="navbar-wrapper">
             <div class="m-header">
-                <a href="../" class="b-brand text-primary">
+                <a href="{{ route('dashboard') }}" class="b-brand text-primary">
                     <!-- ========   Change your logo from here   ============ -->
-                    <h4>TradingCamp</h4>
+                    <h7>Sistem Pengajuan Surat</h7>
                 </a>
             </div>
             <div class="navbar-content">
                 <ul class="pc-navbar">
                     <li class="pc-item">
-                        <a href="../" class="pc-link">
+                        <a href="{{ route('dashboard') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-home-2"></i></span>
                             <span class="pc-mtext">Dashboard</span>
-                        </a>
-                    </li>
-
-                    <li class="pc-item pc-caption">
-                        <label>Data Referral</label>
-                        <i class="ti ti-link"></i>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('data.crypto') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-currency-bitcoin"></i></span>
-                            <span class="pc-mtext">Data Crypto</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('data.forex') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-currency-dollar"></i></span>
-                            <span class="pc-mtext">Data Forex</span>
                         </a>
                     </li>
 
@@ -80,13 +64,32 @@
                         <i class="ti ti-database"></i>
                     </li>
                     <li class="pc-item">
+                        <a href="{{ route('fakultas.index') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-building"></i></span>
+                            <span class="pc-mtext">Data Fakultas</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('prodi.index') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-book"></i></span>
+                            <span class="pc-mtext">Data Prodi</span>
+                        </a>
+                    </li>
+
+
+
+                    <li class="pc-item pc-caption">
+                        <label>Data Master</label>
+                        <i class="ti ti-database"></i>
+                    </li>
+                    {{-- <li class="pc-item">
                         <a href="{{ route('log-activities.index') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-activity"></i></span>
                             <span class="pc-mtext">Log Activity</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="pc-item">
-                        <a href="{{ route('users.index') }}" class="pc-link">
+                        <a href="#" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-users"></i></span>
                             <span class="pc-mtext">Data User</span>
                         </a>
@@ -104,7 +107,23 @@
                         </form>
                     </li>
 
+                    <li class="pc-item">
+                        <a href="{{ route('profile.edit') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-user"></i></span>
+                            <span class="pc-mtext">Profile</span>
+                        </a>
+                    </li>
 
+                    <li class="pc-item">
+                        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="pc-link"
+                                style="background: none; border: none; cursor: pointer;">
+                                <span class="pc-micon"><i class="ti ti-logout"></i></span>
+                                <span class="pc-mtext">Logout</span>
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -157,8 +176,7 @@
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm my-1">
-                    <p class="m-0">TradingCamp &#9829; crafted by Team <a href="#"
-                            target="_blank">R-COde</a>.</p>
+                    <p class="m-0">UNSADA &#9829; crafted by <a href="#" target="_blank">R-COde</a>.</p>
                 </div>
                 <div class="col-auto my-1">
                     <ul class="list-inline footer-link mb-0">
@@ -190,6 +208,8 @@
     <script>
         font_change("Public-Sans");
     </script>
+    @stack('scripts')
+
 </body>
 
 </html>

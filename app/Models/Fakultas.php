@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Prodi extends Model
+class Fakultas extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'fakultas_id'];
+    protected $table = 'fakultas';
 
-    public function fakultas()
-    {
-        return $this->belongsTo(Fakultas::class);
-    }
+    protected $fillable = ['nama'];
 
     public function mahasiswas()
     {
         return $this->hasMany(Mahasiswa::class);
+    }
+    public function prodis()
+    {
+        return $this->hasMany(Prodi::class);
     }
 }

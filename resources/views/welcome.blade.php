@@ -293,8 +293,8 @@
     <div class="container">
       <h1>Sistem Informasi Pengajuan Surat</h1>
       <p>Universitas Darma Persada - Memudahkan pengajuan surat secara online</p>
-      <a href="#pengajuan" class="btn btn-light btn-lg">Login</a>
-      <a href="#pengajuan" class="btn btn-light btn-lg">Register</a>
+      <a href="{{ route('login') }}" class="btn btn-light btn-lg">Login</a>
+      <a href="{{ route('register') }}" class="btn btn-light btn-lg">Register</a>
     </div>
   </section>
 

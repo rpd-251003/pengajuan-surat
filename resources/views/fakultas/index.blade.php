@@ -1,10 +1,10 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="container mt-4">
-        <h2>Data Fakultas</h2>
+    <div class="container">
+        <h3>Data Fakultas</h3>
 
-        <button class="btn btn-success mb-3" id="createNewFakultas">Tambah Fakultas</button>
+        <button class="btn btn-primary mb-3" id="createNewFakultas">Tambah Fakultas</button>
         <div class="card card-body">
 
             <table class="table table-bordered" id="fakultasTable">
@@ -47,10 +47,7 @@
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 
     <script>

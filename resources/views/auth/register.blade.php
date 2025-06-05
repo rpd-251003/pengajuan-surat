@@ -13,7 +13,7 @@
     <meta name="author" content="Universitas Darma Persada">
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="{{ asset('v1/dist/assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="icon" href="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png" type="image/x-icon">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
         id="main-font-link">

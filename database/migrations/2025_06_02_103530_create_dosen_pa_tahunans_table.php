@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('dosen_pa_tahunans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tahun_akademik_id')->constrained()->onDelete('cascade');
-            $table->foreignId('mahasiswa_id')->constrained()->onDelete('cascade');
+            $table->string('tahun_angkatan');
+            $table->foreignId('prodi_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // sebagai dosen PA
             $table->timestamps();
         });
@@ -23,6 +23,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+
     public function down(): void
     {
         Schema::dropIfExists('dosen_pa_tahunans');

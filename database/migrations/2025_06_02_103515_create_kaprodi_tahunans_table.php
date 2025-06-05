@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('kaprodi_tahunans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tahun_akademik_id')->constrained()->onDelete('cascade');
+            $table->string('tahun_angkatan');
             $table->foreignId('prodi_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // sebagai kaprodi
             $table->timestamps();

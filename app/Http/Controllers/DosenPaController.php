@@ -11,7 +11,6 @@ class DosenPaController extends Controller
         $pengajuan = PengajuanSurat::whereHas('user', function ($q) {
             $q->where('dosen_pa_id', auth()->id());
         })->where('status', 'Menunggu Dosen PA')->get();
-
         return view('dosen_pa.dashboard', compact('pengajuan'));
     }
 

@@ -18,7 +18,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" href="{{ asset('v1/dist/assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="icon" href="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png"
+        type="image/x-icon">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
         id="main-font-link">
@@ -58,54 +59,61 @@
                             <span class="pc-mtext">Dashboard</span>
                         </a>
                     </li>
-
-                    <li class="pc-item pc-caption">
-                        <label>Data Master</label>
-                        <i class="ti ti-database"></i>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('fakultas.index') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-building"></i></span>
-                            <span class="pc-mtext">Data Fakultas</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('prodi.index') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-book"></i></span>
-                            <span class="pc-mtext">Data Prodi</span>
-                        </a>
-                    </li>
-
-
-
-                    <li class="pc-item pc-caption">
-                        <label>Data Master</label>
-                        <i class="ti ti-database"></i>
-                    </li>
-                    {{-- <li class="pc-item">
+                    @if (Auth::user()->role == 'tu')
+                        <li class="pc-item pc-caption">
+                            <label>Data Master</label>
+                            <i class="ti ti-database"></i>
+                        </li>
+                        <li class="pc-item">
+                            <a href="{{ route('fakultas.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-building"></i></span>
+                                <span class="pc-mtext">Data Fakultas</span>
+                            </a>
+                        </li>
+                        <li class="pc-item">
+                            <a href="{{ route('prodi.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-book"></i></span>
+                                <span class="pc-mtext">Data Prodi</span>
+                            </a>
+                        </li>
+                        <li class="pc-item">
+                            <a href="{{ route('mahasiswa.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-database"></i></span>
+                                <span class="pc-mtext">Data Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="pc-item">
+                            <a href="{{ route('kaprodi-tahunan.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-database"></i></span>
+                                <span class="pc-mtext">Atur Kaprodi</span>
+                            </a>
+                        </li>
+                        <li class="pc-item">
+                            <a href="{{ route('dosen-pa-tahunan.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-database"></i></span>
+                                <span class="pc-mtext">Atur Dosen PA</span>
+                            </a>
+                        </li>
+                        <li class="pc-item pc-caption">
+                            <label>Data Master</label>
+                            <i class="ti ti-database"></i>
+                        </li>
+                        {{-- <li class="pc-item">
                         <a href="{{ route('log-activities.index') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-activity"></i></span>
                             <span class="pc-mtext">Log Activity</span>
                         </a>
                     </li> --}}
-                    <li class="pc-item">
-                        <a href="#" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-users"></i></span>
-                            <span class="pc-mtext">Data User</span>
-                        </a>
-                    </li>
 
 
-                    <li class="pc-item">
-                        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="pc-link"
-                                style="background: none; border: none; cursor: pointer;">
-                                <span class="pc-micon"><i class="ti ti-logout"></i></span>
-                                <span class="pc-mtext">Logout</span>
-                            </button>
-                        </form>
-                    </li>
+                        <li class="pc-item">
+                            <a href="#" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-users"></i></span>
+                                <span class="pc-mtext">Data User</span>
+                            </a>
+                        </li>
+                    @endif
+
 
                     <li class="pc-item">
                         <a href="{{ route('profile.edit') }}" class="pc-link">
@@ -176,7 +184,7 @@
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm my-1">
-                    <p class="m-0">UNSADA &#9829; crafted by <a href="#" target="_blank">R-COde</a>.</p>
+                    <p class="m-0">UNSADA &#9829;.</p>
                 </div>
                 <div class="col-auto my-1">
                     <ul class="list-inline footer-link mb-0">
@@ -208,6 +216,10 @@
     <script>
         font_change("Public-Sans");
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 
 </body>

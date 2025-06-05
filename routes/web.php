@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DosenPaController;
+use App\Http\Controllers\DosenPaTahunanController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\KaprodiController;
+use App\Http\Controllers\KaprodiTahunanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\ProfileController;
@@ -12,6 +14,8 @@ use App\Http\Controllers\WadekController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Models\Fakultas;
 use Illuminate\Support\Facades\Route;
+
+
 
 
 
@@ -53,6 +57,11 @@ Route::middleware(['auth', RoleMiddleware::class . ':wadek1'])->group(function (
 Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
     Route::get('/tu/dashboard', [TuController::class, 'index'])->name('tu.dashboard');
     Route::get('/tu/laporan', [TuController::class, 'laporanBulanan'])->name('tu.laporan');
+
+
+    Route::resource('kaprodi-tahunan', KaprodiTahunanController::class);
+    Route::resource('dosen-pa-tahunan', DosenPaTahunanController::class);
+
 
     // Fakultas
     Route::get('fakultas-data', [FakultasController::class, 'getData'])->name('fakultas.data');

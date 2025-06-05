@@ -14,14 +14,21 @@ return new class extends Migration
         Schema::create('pengajuan_surats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mahasiswa_id')->constrained()->onDelete('cascade');
-            $table->foreignId('tahun_akademik_id')->constrained()->onDelete('cascade');
+            $table->string('tahun_angkatan');
             $table->string('jenis_surat');
             $table->text('keterangan')->nullable();
+            $table->foreignId('approved_by_dosen_pa')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at_dosen_pa')->nullable();
+            $table->foreignId('approved_by_kaprodi')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at_kaprodi')->nullable();
+            $table->foreignId('approved_by_wadek1')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at_wadek1')->nullable();
+            $table->foreignId('approved_by_staff_tu')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at_staff_tu')->nullable();
             $table->enum('status', ['diajukan', 'diproses', 'disetujui', 'ditolak'])->default('diajukan');
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

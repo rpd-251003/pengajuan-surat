@@ -94,6 +94,13 @@
                                 <span class="pc-mtext">Atur Dosen PA</span>
                             </a>
                         </li>
+                        <li class="pc-item">
+                            <a href="{{ route('jenis-surat.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+                                <span class="pc-mtext">Jenis Surat</span>
+                            </a>
+                        </li>
+
                         <li class="pc-item pc-caption">
                             <label>Data Master</label>
                             <i class="ti ti-database"></i>
@@ -110,6 +117,13 @@
                             <a href="#" class="pc-link">
                                 <span class="pc-micon"><i class="ti ti-users"></i></span>
                                 <span class="pc-mtext">Data User</span>
+                            </a>
+                        </li>
+                    @elseif (Auth::user()->role == 'mahasiswa')
+                        <li class="pc-item">
+                            <a href="{{ route('pengajuan_surat.create') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-mail-forward"></i></span>
+                                <span class="pc-mtext">Pengajuan Surat</span>
                             </a>
                         </li>
                     @endif

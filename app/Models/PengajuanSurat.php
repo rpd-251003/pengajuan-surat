@@ -10,31 +10,50 @@ class PengajuanSurat extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'jenis_surat',
-        'keperluan',
-        'status',
-        'catatan',
-        'tanggal_pengajuan',
+        'mahasiswa_id',
+        'tahun_angkatan',
+        'prodi_id',
+        'fakultas_id',
+        'jenis_surat_id',
+        'keterangan',
+        'approved_by_dosen_pa',
+        'approved_at_dosen_pa',
+        'approved_by_kaprodi',
+        'approved_at_kaprodi',
+        'approved_by_wadek1',
+        'approved_at_wadek1',
+        'approved_by_staff_tu',
+        'approved_at_staff_tu',
+        'status'
     ];
 
-    /**
-     * Relasi ke User (mahasiswa yang mengajukan surat)
-     */
-    public function user()
+    public function jenisSurat()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(JenisSurat::class);
     }
 
-        // Relasi ke mahasiswa (user)
     public function mahasiswa()
     {
-        return $this->belongsTo(User::class, 'mahasiswa_id');
+        return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
     }
 
-    // Relasi ke tahun akademik
-    public function tahunAkademik()
+    public function dosenPA()
     {
-        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+        return $this->belongsTo(User::class, 'approved_by_dosen_pa');
+    }
+
+    public function kaprodi()
+    {
+        return $this->belongsTo(User::class, 'approved_by_kaprodi');
+    }
+
+    public function wadek1()
+    {
+        return $this->belongsTo(User::class, 'approved_by_wadek1');
+    }
+
+    public function staffTU()
+    {
+        return $this->belongsTo(User::class, 'approved_by_staff_tu');
     }
 }

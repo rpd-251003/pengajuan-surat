@@ -60,9 +60,11 @@ class PengajuanSuratController extends Controller
 
     public function index()
     {
-        $pengajuans = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])->paginate(15);
-        return view('admin.pengajuan_surat.index', compact('pengajuans'));
+        $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])->get();
+
+        return view('admin.pengajuan_surat.index', compact('pengajuanSurats'));
     }
+
 
     // ================= Dosen PA =================
 

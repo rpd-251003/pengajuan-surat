@@ -59,6 +59,16 @@
                             <span class="pc-mtext">Dashboard</span>
                         </a>
                     </li>
+                    @if (Auth::user()->role != 'mahasiswa')
+                        <li class="pc-item">
+                            <a href="{{ route('admin.pengajuan.index') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+                                <span class="pc-mtext">List Pengajuan</span>
+                            </a>
+                        </li>
+                    @endif
+
+
                     @if (Auth::user()->role == 'tu')
                         <li class="pc-item pc-caption">
                             <label>Data Master</label>

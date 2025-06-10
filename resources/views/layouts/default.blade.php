@@ -34,6 +34,8 @@
 
 </head>
 
+@stack('styles')
+
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
@@ -245,6 +247,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
+
 
 </body>
 

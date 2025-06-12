@@ -126,9 +126,9 @@
 
 
                         <li class="pc-item">
-                            <a href="#" class="pc-link">
+                            <a href="{{ route('users.index') }}" class="pc-link">
                                 <span class="pc-micon"><i class="ti ti-users"></i></span>
-                                <span class="pc-mtext">Data User</span>
+                                <span class="pc-mtext">Manajemen Users</span>
                             </a>
                         </li>
                     @elseif (Auth::user()->role == 'mahasiswa')
@@ -136,6 +136,12 @@
                             <a href="{{ route('pengajuan_surat.create') }}" class="pc-link">
                                 <span class="pc-micon"><i class="ti ti-mail-forward"></i></span>
                                 <span class="pc-mtext">Pengajuan Surat</span>
+                            </a>
+                        </li>
+                        <li class="pc-item">
+                            <a href="{{ route('pengajuan_surat.history') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-history"></i></span>
+                                <span class="pc-mtext">History Pengajuan</span>
                             </a>
                         </li>
                     @endif

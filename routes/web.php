@@ -1,31 +1,23 @@
 <?php
 
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\DosenPaController;
-use App\Http\Controllers\DosenPaTahunanController;
-use App\Http\Controllers\FakultasController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\JenisSuratController;
-use App\Http\Controllers\KaprodiController;
-use App\Http\Controllers\KaprodiTahunanController;
-use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\PengajuanSuratController;
-use App\Http\Controllers\ProdiController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TuController;
-use App\Http\Controllers\WadekController;
-use App\Http\Middleware\RoleMiddleware;
 use App\Models\Fakultas;
 use Illuminate\Support\Facades\Route;
-
-
-
-
-
-
-
-
-
+use App\Http\Controllers\TuController;
+use App\Http\Middleware\RoleMiddleware;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\WadekController;
+use App\Http\Controllers\DosenPaController;
+use App\Http\Controllers\KaprodiController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FakultasController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\JenisSuratController;
+use App\Http\Controllers\DosenPaTahunanController;
+use App\Http\Controllers\KaprodiTahunanController;
+use App\Http\Controllers\PengajuanSuratController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 
 Route::get('/', function () {
@@ -61,6 +53,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':wadek1'])->group(function (
 // Wadek
 Route::middleware(['auth', RoleMiddleware::class . ':mahasiswa'])->group(function () {
     Route::get('/mahasiswa/dashboard', [HomeController::class, 'index'])->name('mahasiswa.dashboard');
+    Route::get('/pengajuan-surat/history', [PengajuanSuratController::class, 'history'])->name('pengajuan_surat.history');
 });
 
 
@@ -68,6 +61,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':mahasiswa'])->group(functio
 Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
     Route::get('/tu/dashboard', [TuController::class, 'index'])->name('tu.dashboard');
     Route::get('/tu/laporan', [TuController::class, 'laporanBulanan'])->name('tu.laporan');
+
+    Route::resource('users', UsersController::class);
+
 
 
     Route::resource('kaprodi-tahunan', KaprodiTahunanController::class);

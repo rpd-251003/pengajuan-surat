@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\JenisSurat;
 use App\Models\Mahasiswa;
-use App\Models\PengajuanSurat;
+use App\Models\JenisSurat;
 use Illuminate\Http\Request;
+use App\Models\PengajuanSurat;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class PengajuanSuratController extends Controller
@@ -33,6 +34,27 @@ class PengajuanSuratController extends Controller
             return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
+        // Cari Kaprodi berdasarkan tahun_angkatan dan prodi_id
+        $kaprodi = DB::table('kaprodi_tahunans')
+            ->where('tahun_angkatan', $mahasiswa->angkatan)
+            ->where('prodi_id', $mahasiswa->prodi_id)
+            ->first();
+
+        // Cari Dosen PA berdasarkan tahun_angkatan dan prodi_id
+        $dosenPa = DB::table('dosen_pa_tahunans')
+            ->where('tahun_angkatan', $mahasiswa->angkatan)
+            ->where('prodi_id', $mahasiswa->prodi_id)
+            ->first();
+
+        // Validasi jika data kaprodi atau dosen PA tidak ditemukan
+        if (!$kaprodi) {
+            return redirect()->back()->with('error', 'Data Kaprodi untuk angkatan dan prodi Anda tidak ditemukan.');
+        }
+
+        if (!$dosenPa) {
+            return redirect()->back()->with('error', 'Data Dosen PA untuk angkatan dan prodi Anda tidak ditemukan.');
+        }
+
         $pengajuan = PengajuanSurat::create([
             'mahasiswa_id' => $mahasiswa->id,
             'jenis_surat_id' => $request->jenis_surat,
@@ -40,9 +62,11 @@ class PengajuanSuratController extends Controller
             'tahun_angkatan' => $mahasiswa->angkatan,
             'prodi_id' => $mahasiswa->prodi_id,
             'fakultas_id' => $mahasiswa->fakultas_id,
+            'approved_by_kaprodi' => $kaprodi->user_id,
+            'approved_by_dosen_pa' => $dosenPa->user_id,
         ]);
 
-        return redirect()->route('pengajuan_surat.create')->with('success', 'Pengajuan surat berhasil dikirim.');
+        return redirect()->route('pengajuan_surat.history')->with('success', 'Pengajuan surat berhasil dikirim.');
     }
 
     public function getDeskripsi(Request $request)
@@ -56,6 +80,29 @@ class PengajuanSuratController extends Controller
         }
 
         return response()->json(['deskripsi' => $data->deskripsi]);
+    }
+
+    // Method untuk menampilkan history pengajuan surat mahasiswa
+    public function history()
+    {
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+
+        if (!$mahasiswa) {
+            return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $pengajuanSurats = PengajuanSurat::with([
+            'jenisSurat',
+            'dosenPA',
+            'kaprodi',
+            'wadek1',
+            'staffTU'
+        ])
+            ->where('mahasiswa_id', $mahasiswa->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('mahasiswa.pengajuan_surat.history', compact('pengajuanSurats'));
     }
 
     public function index()

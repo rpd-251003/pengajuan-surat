@@ -26,6 +26,7 @@
     <div class="modal fade" id="ajaxModal" tabindex="-1">
         <div class="modal-dialog">
             <form id="formInput">
+                @csrf
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Form Kaprodi Tahunan</h5>
@@ -97,7 +98,6 @@
             $('#createNew').click(function() {
                 $('#formInput').trigger("reset");
                 $('#ajaxModal').modal('show');
-
             });
 
             $('body').on('click', '.edit', function() {

@@ -112,6 +112,21 @@ class PengajuanSuratController extends Controller
         return view('admin.pengajuan_surat.index', compact('pengajuanSurats'));
     }
 
+    public function index_dosen()
+    {
+
+        $login_id = Auth::user()->id;
+        $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])
+            ->where(function ($query) use ($login_id) {
+                $query->where('approved_by_dosen_pa', $login_id)
+                    ->orWhere('approved_by_kaprodi', $login_id);
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('admin.pengajuan_surat.role.index', compact('pengajuanSurats'));
+    }
+
 
     // ================= Dosen PA =================
 
@@ -139,6 +154,34 @@ class PengajuanSuratController extends Controller
         $pengajuan->save();
 
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Dosen PA.');
+    }
+
+    public function rejectDouble(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_reject' => 'required|string',
+        ]);
+
+        $pengajuan = PengajuanSurat::findOrFail($id);
+        $pengajuan->approved_at_kaprodi = null;
+        $pengajuan->approved_at_dosen_pa = null;
+        // update keterangan dengan alasan reject
+        $pengajuan->keterangan = 'Ditolak oleh Dosen PA / Kaprodi: ' . $request->alasan_reject;
+        $pengajuan->save();
+
+        return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Dosen PA.');
+    }
+
+    public function approveDouble(Request $id)
+    {
+
+        $pengajuan = PengajuanSurat::findOrFail($id);
+        $pengajuan->approved_at_kaprodi = now();
+        $pengajuan->approved_at_dosen_pa = now();
+        $pengajuan->save();
+
+        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui oleh Dosen PA & Kaprodi.');
+
     }
 
 

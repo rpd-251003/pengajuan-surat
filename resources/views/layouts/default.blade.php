@@ -23,12 +23,15 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
         id="main-font-link">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/tabler-icons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/fontawesome.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/material.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/css/style.css') }}" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/css/style-preset.css') }}">
+
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
@@ -48,20 +51,26 @@
     <nav class="pc-sidebar">
         <div class="navbar-wrapper">
             <div class="m-header">
-                <a href="{{ route('dashboard') }}" class="b-brand text-primary">
+                <a href="{{ route('dashboard') }}" class="b-brand mt-3 text-primary">
                     <!-- ========   Change your logo from here   ============ -->
-                    <h7>Sistem Pengajuan Surat</h7>
+                    <h5> <img src="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png"
+                            width="30" alt=""> SPS</h5>
                 </a>
             </div>
             <div class="navbar-content">
                 <ul class="pc-navbar">
-                    <li class="pc-item">
-                        <a href="{{ route('dashboard') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-home-2"></i></span>
-                            <span class="pc-mtext">Dashboard</span>
-                        </a>
-                    </li>
-                    @if (Auth::user()->role != 'mahasiswa')
+
+                    @php
+                        $excludedRoles = ['mahasiswa', 'dosen'];
+                    @endphp
+
+                    @if (!in_array(Auth::user()->role, $excludedRoles))
+                        <li class="pc-item">
+                            <a href="{{ route('dashboard') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-home-2"></i></span>
+                                <span class="pc-mtext">Dashboard</span>
+                            </a>
+                        </li>
                         <li class="pc-item">
                             <a href="{{ route('admin.pengajuan.index') }}" class="pc-link">
                                 <span class="pc-micon"><i class="ti ti-file-text"></i></span>
@@ -69,6 +78,16 @@
                             </a>
                         </li>
                     @endif
+
+                    @if (Auth::user()->role == 'dosen')
+                        <li class="pc-item">
+                            <a href="{{ route('admin.pengajuan.dosen') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+                                <span class="pc-mtext">List Pengajuan</span>
+                            </a>
+                        </li>
+                    @endif
+
 
 
                     @if (Auth::user()->role == 'tu')
@@ -133,6 +152,12 @@
                         </li>
                     @elseif (Auth::user()->role == 'mahasiswa')
                         <li class="pc-item">
+                            <a href="{{ route('mahasiswa.dashboard') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-home-2"></i></span>
+                                <span class="pc-mtext">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="pc-item">
                             <a href="{{ route('pengajuan_surat.create') }}" class="pc-link">
                                 <span class="pc-micon"><i class="ti ti-mail-forward"></i></span>
                                 <span class="pc-mtext">Pengajuan Surat</span>
@@ -194,7 +219,7 @@
                         <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown"
                             href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside"
                             aria-expanded="false">
-                            <img src="{{ asset('v1/dist/assets/images/user/avatar-2.jpg') }}" alt="user-image"
+                            <img src="{{ asset('v1/dist/assets/images/img-navbar-card.png') }}" alt="user-image"
                                 class="user-avtar">
                             <span>{{ Auth::user()->name }}</span>
                         </a>
@@ -216,7 +241,7 @@
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm my-1">
-                    <p class="m-0">UNSADA &#9829;.</p>
+                    <p class="m-0">UNSADA - Sistem Pengajuan Surat.</p>
                 </div>
                 <div class="col-auto my-1">
                     <ul class="list-inline footer-link mb-0">
@@ -248,10 +273,13 @@
     <script>
         font_change("Public-Sans");
     </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @stack('scripts')
 
 

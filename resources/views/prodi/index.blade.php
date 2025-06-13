@@ -2,22 +2,29 @@
 
 @section('content')
     <div class="container">
-        <h3>Data Prodi</h3>
-        <button id="btn-add" class="btn btn-primary mb-3">Tambah Prodi</button>
-        <div class="card card-body">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Data Prodi</h4>
+                <button id="btn-add" class="btn btn-primary mb-0">
+                    <i class="ti ti-plus me-2"></i>Tambah Prodi
+                </button>
+            </div>
 
-            <table id="prodi-table" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama Prodi</th>
-                        <th>Fakultas</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="card-body">
+                <table id="prodi-table" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Prodi</th>
+                            <th>Fakultas</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
+
 
     <!-- Modal Form -->
     <div class="modal fade" id="prodiModal" tabindex="-1" aria-labelledby="prodiModalLabel" aria-hidden="true">
@@ -53,8 +60,6 @@
 @endsection
 
 @push('scripts')
-
-
     <script>
         $.ajaxSetup({
             headers: {

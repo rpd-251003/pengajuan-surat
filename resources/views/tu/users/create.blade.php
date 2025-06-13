@@ -36,10 +36,8 @@
                 <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                 <select class="form-select" id="role" name="role" required>
                     <option value="">Pilih Role</option>
-                    <option value="admin">Admin</option>
                     <option value="mahasiswa">Mahasiswa</option>
                     <option value="dosen">Dosen</option>
-                    <option value="kaprodi">Kaprodi</option>
                     <option value="wadek1">Wadek 1</option>
                     <option value="tu">TU</option>
                 </select>

@@ -15,6 +15,11 @@ class HomeController extends Controller
         return view('mahasiswa');
     }
 
+    public function index_admin()
+    {
+        return view('dashboard');
+    }
+
     public function index_mahasiswa()
     {
 

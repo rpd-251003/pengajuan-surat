@@ -38,10 +38,8 @@
                 <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                 <select class="form-select" id="role" name="role" required>
                     <option value="">Pilih Role</option>
-                    <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                     <option value="mahasiswa" {{ $user->role == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                     <option value="dosen" {{ $user->role == 'dosen' ? 'selected' : '' }}>Dosen</option>
-                    <option value="kaprodi" {{ $user->role == 'kaprodi' ? 'selected' : '' }}>Kaprodi</option>
                     <option value="wadek1" {{ $user->role == 'wadek1' ? 'selected' : '' }}>Wadek 1</option>
                     <option value="tu" {{ $user->role == 'tu' ? 'selected' : '' }}>TU</option>
                 </select>

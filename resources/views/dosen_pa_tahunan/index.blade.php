@@ -2,11 +2,16 @@
 
 @section('content')
     <div class="container">
-        <h3 class="">Data Dosen PA Tahunan</h4>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Data Dosen PA Tahunan</h4>
+                <button type="button" class="btn btn-primary mb-3" id="btnAdd">
+                    <i class="ti ti-plus me-2"></i>Tambah User
+                </button>
 
-            <button class="btn btn-success mb-3" id="btnAdd">Tambah Data</button>
-            <div class="card card-body">
+            </div>
 
+            <div class="card-body">
                 <table class="table table-bordered" id="dosenPaTable">
                     <thead>
                         <tr>
@@ -19,6 +24,7 @@
                     </thead>
                 </table>
             </div>
+        </div>
     </div>
 
     <!-- Modal Form -->
@@ -122,7 +128,8 @@
                     },
                     error: function(xhr) {
                         alert(
-                            'Terjadi kesalahan. Pastikan semua data telah diisi dengan benar.');
+                            'Terjadi kesalahan. Pastikan semua data telah diisi dengan benar.'
+                        );
                     }
                 });
             });

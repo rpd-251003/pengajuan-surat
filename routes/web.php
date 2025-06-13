@@ -31,14 +31,13 @@ Route::get('/dashboard', function () {
 Route::get('/prodi-by-fakultas/{fakultas_id}', [RegisteredUserController::class, 'getProdiByFakultas']);
 
 // Dosen PA
-Route::middleware(['auth', RoleMiddleware::class . ':dosen_pa'])->group(function () {
-    Route::get('/dosen-pa/dashboard', [DosenPaController::class, 'index'])->name('dosenpa.dashboard');
-    Route::post('/dosen-pa/approve/{id}', [DosenPaController::class, 'approve'])->name('dosenpa.approve');
+Route::middleware(['auth', RoleMiddleware::class . ':dosen'])->group(function () {
+    Route::get('/dosen/dashboard', [HomeController::class, 'index_admin'])->name('dosenpa.dashboard');
 });
 
 // Kaprodi
 Route::middleware(['auth', RoleMiddleware::class . ':kaprodi'])->group(function () {
-    Route::get('/kaprodi/dashboard', [KaprodiController::class, 'index'])->name('kaprodi.dashboard');
+    Route::get('/kaprodi/dashboard', [HomeController::class, 'index_admin'])->name('kaprodi.dashboard');
     Route::post('/kaprodi/approve/{id}', [KaprodiController::class, 'approve']);
     Route::post('/kaprodi/reject/{id}', [KaprodiController::class, 'reject']);
 });
@@ -59,7 +58,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':mahasiswa'])->group(functio
 
 // TU
 Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
-    Route::get('/tu/dashboard', [TuController::class, 'index'])->name('tu.dashboard');
+    Route::get('/tu/dashboard', [HomeController::class, 'index_admin'])->name('tu.dashboard');
     Route::get('/tu/laporan', [TuController::class, 'laporanBulanan'])->name('tu.laporan');
 
     Route::resource('users', UsersController::class);
@@ -120,20 +119,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengajuan-surat/deskripsi', [PengajuanSuratController::class, 'getDeskripsi'])->name('pengajuan_surat.deskripsi');
 });
 
-Route::prefix('admin/pengajuan')->middleware(['auth'])->group(function () {
+Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {
     Route::get('/', [PengajuanSuratController::class, 'index'])->name('admin.pengajuan.index');
+    Route::get('/dosen', [PengajuanSuratController::class, 'index_dosen'])->name('admin.pengajuan.dosen');
 
     // Approve by each level
     Route::patch('/{id}/approve_dosen_pa', [PengajuanSuratController::class, 'approveDosenPA'])->name('admin.pengajuan.approve_dosen_pa');
     Route::patch('/{id}/approve_kaprodi', [PengajuanSuratController::class, 'approveKaprodi'])->name('admin.pengajuan.approve_kaprodi');
     Route::patch('/{id}/approve_wadek1', [PengajuanSuratController::class, 'approveWadek1'])->name('admin.pengajuan.approve_wadek1');
-    Route::patch('/{id}/appr    ove_staff_tu', [PengajuanSuratController::class, 'approveStaffTU'])->name('admin.pengajuan.approve_staff_tu');
+    Route::patch('/{id}/approve_staff_tu', [PengajuanSuratController::class, 'approveStaffTU'])->name('admin.pengajuan.approve_staff_tu');
+    Route::patch('/{id}/approve_double', [PengajuanSuratController::class, 'approveDouble'])->name('admin.pengajuan.approve_double');
 
     // Reject by each level (dengan alasan)
     Route::patch('/{id}/reject_dosen_pa', [PengajuanSuratController::class, 'rejectDosenPA'])->name('admin.pengajuan.reject_dosen_pa');
     Route::patch('/{id}/reject_kaprodi', [PengajuanSuratController::class, 'rejectKaprodi'])->name('admin.pengajuan.reject_kaprodi');
     Route::patch('/{id}/reject_wadek1', [PengajuanSuratController::class, 'rejectWadek1'])->name('admin.pengajuan.reject_wadek1');
     Route::patch('/{id}/reject_staff_tu', [PengajuanSuratController::class, 'rejectStaffTU'])->name('admin.pengajuan.reject_staff_tu');
+    Route::patch('/{id}/reject_double', [PengajuanSuratController::class, 'rejectDouble'])->name('admin.pengajuan.reject_double');
 });
 
 

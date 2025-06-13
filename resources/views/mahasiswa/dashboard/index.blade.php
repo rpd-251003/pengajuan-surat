@@ -1,10 +1,10 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="container mt-5">
+    <div class="container mt-3">
         <h1 class="mb-1">Selamat Datang</h1>
-        <h3 class="mb-5">{{ Auth::user()->name }}</h3>
-        <div class="row">
+        <h3 class="mb-1 fw-light">{{ Auth::user()->name }}</h3>
+        <div class="row mt-5">
 
             <!-- Recent Letter Card -->
             <div class="col-12 mb-4">

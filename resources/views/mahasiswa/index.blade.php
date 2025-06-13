@@ -1,11 +1,14 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="container">
-        <h3>Data Mahasiswa</h3>
-        <button class="btn btn-primary mb-3" id="btnTambah">Tambah Mahasiswa</button>
-        <div class="card card-body">
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Data Mahasiswa</h4>
 
+        </div>
+
+        <div class="card-body">
             <table id="mahasiswaTable" class="table table-bordered table-striped">
                 <thead>
                     <tr>
@@ -21,6 +24,8 @@
             </table>
         </div>
     </div>
+</div>
+
 
     <!-- Modal Form -->
     <div class="modal fade" id="modalForm" tabindex="-1" aria-labelledby="modalFormLabel" aria-hidden="true">

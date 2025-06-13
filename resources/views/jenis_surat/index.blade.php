@@ -1,11 +1,16 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="container">
-        <h3>Data Jenis Surat</h3>
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Data Jenis Surat</h4>
+            <button class="btn btn-primary mb-0" id="createNewJenis">
+                <i class="ti ti-plus me-2"></i>Tambah Jenis Surat
+            </button>
+        </div>
 
-        <button class="btn btn-primary mb-3" id="createNewJenis">Tambah Jenis Surat</button>
-        <div class="card card-body">
+        <div class="card-body">
             <table class="table table-bordered" id="jenisTable">
                 <thead>
                     <tr>
@@ -18,6 +23,8 @@
             </table>
         </div>
     </div>
+</div>
+
 
     <!-- Modal Form -->
     <div class="modal fade" id="ajaxModel" tabindex="-1" aria-labelledby="ajaxModelLabel" aria-hidden="true">

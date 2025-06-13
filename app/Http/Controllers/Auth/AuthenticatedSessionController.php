@@ -42,7 +42,7 @@ class AuthenticatedSessionController extends Controller
         // Redirect berdasarkan role
         return match ($user->role) {
             'mahasiswa' => redirect('/mahasiswa/dashboard'),
-            'dosen_pa' => redirect('/dosen-pa/dashboard'),
+            'dosen' => redirect('/dosen/dashboard'),
             'kaprodi' => redirect('/kaprodi/dashboard'),
             'wadek1' => redirect('/wadek1/dashboard'),
             'tu' => redirect('/tu/dashboard'),

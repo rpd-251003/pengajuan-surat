@@ -2,25 +2,30 @@
 
 @section('content')
     <div class="container">
-        <h3>Data Kaprodi Tahunan</h3>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Data Kaprodi Tahunan</h4>
+                <button class="btn btn-primary mb-0" id="createNew">
+                    <i class="ti ti-plus me-2"></i>Tambah Data
+                </button>
+            </div>
 
-        <button class="btn btn-primary mb-3" id="createNew">Tambah Data</button>
-
-        <div class="card card-body">
-
-            <table class="table table-bordered" id="kaprodiTable">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tahun Angkatan</th>
-                        <th>Prodi</th>
-                        <th>User</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="card-body">
+                <table class="table table-bordered" id="kaprodiTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tahun Angkatan</th>
+                            <th>Prodi</th>
+                            <th>User</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
+
 
     <!-- Modal -->
     <div class="modal fade" id="ajaxModal" tabindex="-1">

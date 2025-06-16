@@ -14,13 +14,23 @@
                             <i class="ti ti-clock-history me-2"></i>
                             Pengajuan Surat Terbaru
                         </h5>
+
+
                         <a href="{{ route('pengajuan_surat.history') }}" class="btn btn-outline-primary btn-sm">
                             <i class="ti ti-eye me-1"></i>
                             Lihat Semua
                         </a>
                     </div>
                     <div class="card-body">
-                        @if(isset($latestPengajuan) && $latestPengajuan)
+                        <div class="mb-2">
+                            <span class="badge bg-warning fs-6 mb-1 me-1">Diajukan: {{ $pengajuanCounts['diajukan'] }}</span>
+                            <span class="badge bg-primary fs-6 mb-1 text-white me-1">Diproses:
+                                {{ $pengajuanCounts['diproses'] }}</span>
+                            <span class="badge bg-success fs-6 mb-1 me-1">Disetujui: {{ $pengajuanCounts['disetujui'] }}</span>
+                            <span class="badge bg-danger fs-6 mb-1">Ditolak: {{ $pengajuanCounts['ditolak'] }}</span>
+                        </div>
+                        <hr>
+                        @if (isset($latestPengajuan) && $latestPengajuan)
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
@@ -50,11 +60,24 @@
                                                         $statusIcon = 'ti-help';
                                                 }
                                             @endphp
-                                            <i class="ti {{ $statusIcon }} {{ $statusClass }}" style="font-size: 2rem;"></i>
+                                            <i class="ti {{ $statusIcon }} {{ $statusClass }}"
+                                                style="font-size: 2rem;"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-1">{{ $latestPengajuan->jenisSurat->nama ?? 'Jenis Surat' }}</h6>
-                                            <small class="text-muted">{{ $latestPengajuan->created_at->format('d/m/Y H:i') }}</small>
+                                            <h6 class="mb-1">{{ $latestPengajuan->jenisSurat->nama ?? 'Jenis Surat' }}
+                                            </h6>
+
+                                            <small
+                                                class="text-muted">{{ $latestPengajuan->created_at->format('d/m/Y H:i') }}</small>
+                                            @if ($latestPengajuan->fileApproval)
+                                                <div class="mt-1 mb-2">
+                                                    <a href="{{ asset('storage/' . $latestPengajuan->fileApproval->file_surat) }}"
+                                                        target="_blank" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-download me-1"></i>
+                                                        Download File
+                                                    </a>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -86,7 +109,8 @@
                                     @endphp
                                     <span class="badge {{ $badgeClass }} fs-6">{{ $statusText }}</span>
                                     <div class="mt-1">
-                                        <small class="text-muted">{{ $latestPengajuan->created_at->diffForHumans() }}</small>
+                                        <small
+                                            class="text-muted">{{ $latestPengajuan->created_at->diffForHumans() }}</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -174,7 +198,7 @@
                             </div>
 
                             <!-- Keterangan -->
-                            @if($latestPengajuan->keterangan)
+                            @if ($latestPengajuan->keterangan)
                                 <div class="row mt-3">
                                     <div class="col-12">
                                         <div class="bg-light p-2 rounded">

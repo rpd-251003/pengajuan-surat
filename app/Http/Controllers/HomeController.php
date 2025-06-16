@@ -251,10 +251,15 @@ class HomeController extends Controller
 
     public function index_mahasiswa()
     {
-
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
 
         $latestPengajuan = null;
+        $pengajuanCounts = [
+            'diajukan' => 0,
+            'diproses' => 0,
+            'disetujui' => 0,
+            'ditolak' => 0,
+        ];
 
         if ($mahasiswa) {
             $latestPengajuan = PengajuanSurat::with([
@@ -262,13 +267,24 @@ class HomeController extends Controller
                 'dosenPA',
                 'kaprodi',
                 'wadek1',
-                'staffTU'
+                'staffTU',
+                'fileApproval'
             ])
                 ->where('mahasiswa_id', $mahasiswa->id)
-                ->orderBy('created_at', 'desc')
-                ->first(); // Get only the latest one
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $pengajuanCounts = PengajuanSurat::where('mahasiswa_id', $mahasiswa->id)
+                ->selectRaw("
+                SUM(CASE WHEN status = 'diajukan' THEN 1 ELSE 0 END) as diajukan,
+                SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as diproses,
+                SUM(CASE WHEN status = 'disetujui' THEN 1 ELSE 0 END) as disetujui,
+                SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END) as ditolak
+            ")
+                ->first()
+                ->toArray();
         }
 
-        return view('mahasiswa.dashboard.index', compact('latestPengajuan'));
+        return view('mahasiswa.dashboard.index', compact('latestPengajuan', 'pengajuanCounts'));
     }
 }

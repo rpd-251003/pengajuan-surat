@@ -96,7 +96,8 @@ class PengajuanSuratController extends Controller
             'dosenPA',
             'kaprodi',
             'wadek1',
-            'staffTU'
+            'staffTU',
+            'fileApproval'
         ])
             ->where('mahasiswa_id', $mahasiswa->id)
             ->orderBy('created_at', 'desc')
@@ -114,7 +115,7 @@ class PengajuanSuratController extends Controller
             'kaprodi',
             'wadek1',
             'staffTU',
-            'fileApproval' // <-- tambah ini
+            'fileApproval'
         ]);
 
         // Search functionality

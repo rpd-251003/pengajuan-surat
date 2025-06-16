@@ -59,6 +59,7 @@
                                             <th>Keterangan</th>
                                             <th>Status</th>
                                             <th>Timeline Approval</th>
+                                            <th>Download File Surat</th>
                                             <th>Tanggal Pengajuan</th>
                                         </tr>
                                     </thead>
@@ -212,6 +213,20 @@
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <td>
+
+                                                    @if ($pengajuan->fileApproval)
+                                                        <div class="mt-4">
+                                                            <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}"
+                                                                target="_blank" class="btn btn-sm btn-success">
+                                                                <i class="fas fa-download me-1"></i>
+                                                                Download File
+                                                            </a>
+                                                        </div>
+                                                    @else
+                                                    Belum Tersedia
+                                                    @endif
+                                                </td>
                                                 <td>{{ $pengajuan->created_at->format('d/m/Y H:i') }}</td>
                                             </tr>
                                         @endforeach
@@ -280,5 +295,4 @@
             }
         </style>
     @endpush
-
 @endsection

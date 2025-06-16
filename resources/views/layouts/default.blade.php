@@ -13,9 +13,6 @@
     <meta name="keywords"
         content="Universitas Darma Persada, Sistem Pengajuan Surat, Pengajuan Surat Online, Administrasi Universitas, Surat Resmi Kampus">
     <meta name="author" content="Universitas Darma Persada">
-
-
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png"
@@ -39,7 +36,7 @@
 
 @stack('styles')
 
-<body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+<body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="dark">
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
         <div class="loader-track">
@@ -87,8 +84,6 @@
                             </a>
                         </li>
                     @endif
-
-
 
                     @if (Auth::user()->role == 'tu')
                         <li class="pc-item pc-caption">
@@ -259,7 +254,7 @@
     <script src="{{ asset('v1/dist/assets/js/pcoded.js') }}"></script>
     <script src="{{ asset('v1/dist/assets/js/plugins/feather.min.js') }}"></script>
     <script>
-        layout _change('light');
+        layout _change('dark');
     </script>
     <script>
         change_box_container('false');
@@ -268,7 +263,7 @@
         layout_rtl_change('false');
     </script>
     <script>
-        preset_change("preset-1");
+        preset_change("preset-2");
     </script>
     <script>
         font_change("Public-Sans");

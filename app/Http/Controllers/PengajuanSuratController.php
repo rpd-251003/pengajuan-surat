@@ -105,11 +105,56 @@ class PengajuanSuratController extends Controller
         return view('mahasiswa.pengajuan_surat.history', compact('pengajuanSurats'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])->get();
+        $query = PengajuanSurat::with([
+            'mahasiswa.user',
+            'jenisSurat',
+            'dosenPA',
+            'kaprodi',
+            'wadek1',
+            'staffTU',
+            'fileApproval' // <-- tambah ini
+        ]);
 
-        return view('admin.pengajuan_surat.index', compact('pengajuanSurats'));
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereHas('mahasiswa.user', function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', "%{$searchTerm}%");
+                })
+                    ->orWhereHas('jenisSurat', function ($q) use ($searchTerm) {
+                        $q->where('nama', 'like', "%{$searchTerm}%");
+                    })
+                    ->orWhere('keterangan', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Filter by jenis surat
+        if ($request->filled('jenis_surat')) {
+            $query->whereHas('jenisSurat', function ($q) use ($request) {
+                $q->where('nama', $request->jenis_surat);
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+
+        $pengajuanSurats = $query->orderBy('created_at', 'desc')->paginate(5);
+
+        // Get unique jenis surat for filter dropdown
+        $jenisSuratOptions = PengajuanSurat::with('jenisSurat')
+            ->get()
+            ->pluck('jenisSurat.nama')
+            ->unique()
+            ->filter()
+            ->values();
+
+        return view('admin.pengajuan_surat.index', compact('pengajuanSurats', 'jenisSuratOptions'));
     }
 
     public function index_dosen()
@@ -130,15 +175,130 @@ class PengajuanSuratController extends Controller
 
     // ================= Dosen PA =================
 
+    private function updateStatusAfterApproval(PengajuanSurat $pengajuan, $currentApprover = null)
+    {
+        $requiredApprovals = [
+            'approved_at_dosen_pa',
+            'approved_at_kaprodi',
+            'approved_at_wadek1',
+            'approved_at_staff_tu',
+        ];
+
+        $otherApprovals = $currentApprover
+            ? array_filter($requiredApprovals, fn($field) => $field !== $currentApprover)
+            : $requiredApprovals;
+
+        $isAllApproved = true;
+        foreach ($otherApprovals as $field) {
+            if (empty($pengajuan->$field)) {
+                $isAllApproved = false;
+                break;
+            }
+        }
+
+        if ($isAllApproved) {
+            $pengajuan->status = 'disetujui';
+        } elseif ($pengajuan->status === 'diajukan') {
+            $pengajuan->status = 'diproses';
+        }
+
+        $pengajuan->save();
+    }
+
+
+    public function approveDouble($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        // Cek apakah sebelumnya sudah disetujui
+        if ($pengajuan->approved_at_dosen_pa && $pengajuan->approved_at_kaprodi) {
+            return redirect()->back()->with('error', 'Sudah disetujui oleh Dosen PA dan Kaprodi sebelumnya.');
+        }
+
+        $pengajuan->approved_by_dosen_pa = Auth::id();
+        $pengajuan->approved_at_dosen_pa = now();
+
+        $pengajuan->approved_by_kaprodi = Auth::id();
+        $pengajuan->approved_at_kaprodi = now();
+
+        $pengajuan->save();
+
+        // Evaluasi status setelah approve ganda
+        $this->updateStatusAfterApproval($pengajuan, null); // null karena 2 sekaligus
+
+        return redirect()->back()->with('success', 'Disetujui oleh Dosen PA & Kaprodi.');
+    }
+
+
+
     public function approveDosenPA($id)
     {
         $pengajuan = PengajuanSurat::findOrFail($id);
+
+        if ($pengajuan->approved_at_dosen_pa) {
+            return redirect()->back()->with('error', 'Sudah disetujui sebelumnya.');
+        }
+
         $pengajuan->approved_by_dosen_pa = Auth::id();
         $pengajuan->approved_at_dosen_pa = now();
         $pengajuan->save();
 
-        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui oleh Dosen PA.');
+        $this->updateStatusAfterApproval($pengajuan, 'approved_at_dosen_pa');
+
+        return redirect()->back()->with('success', 'Disetujui oleh Dosen PA.');
     }
+
+    public function approveKaprodi($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        if ($pengajuan->approved_at_kaprodi) {
+            return redirect()->back()->with('error', 'Sudah disetujui sebelumnya.');
+        }
+
+        $pengajuan->approved_by_kaprodi = Auth::id();
+        $pengajuan->approved_at_kaprodi = now();
+        $pengajuan->save();
+
+        $this->updateStatusAfterApproval($pengajuan, 'approved_at_kaprodi');
+
+        return redirect()->back()->with('success', 'Disetujui oleh Kaprodi.');
+    }
+
+    public function approveWadek1($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        if ($pengajuan->approved_at_wadek1) {
+            return redirect()->back()->with('error', 'Sudah disetujui sebelumnya.');
+        }
+
+        $pengajuan->approved_by_wadek1 = Auth::id();
+        $pengajuan->approved_at_wadek1 = now();
+        $pengajuan->save();
+
+        $this->updateStatusAfterApproval($pengajuan, 'approved_at_wadek1');
+
+        return redirect()->back()->with('success', 'Disetujui oleh Wadek 1.');
+    }
+
+    public function approveStaffTU($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        if ($pengajuan->approved_at_staff_tu) {
+            return redirect()->back()->with('error', 'Sudah disetujui sebelumnya.');
+        }
+
+        $pengajuan->approved_by_staff_tu = Auth::id();
+        $pengajuan->approved_at_staff_tu = now();
+        $pengajuan->save();
+
+        $this->updateStatusAfterApproval($pengajuan, 'approved_at_staff_tu');
+
+        return redirect()->back()->with('success', 'Disetujui oleh Staff TU.');
+    }
+
 
     public function rejectDosenPA(Request $request, $id)
     {
@@ -150,9 +310,11 @@ class PengajuanSuratController extends Controller
         $pengajuan->approved_by_dosen_pa = null;
         $pengajuan->approved_at_dosen_pa = null;
         // update keterangan dengan alasan reject
+        $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Dosen PA: ' . $request->alasan_reject;
         $pengajuan->save();
 
+        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Dosen PA.');
     }
 
@@ -166,36 +328,19 @@ class PengajuanSuratController extends Controller
         $pengajuan->approved_at_kaprodi = null;
         $pengajuan->approved_at_dosen_pa = null;
         // update keterangan dengan alasan reject
+        $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Dosen PA / Kaprodi: ' . $request->alasan_reject;
         $pengajuan->save();
 
+        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Dosen PA.');
     }
 
-    public function approveDouble(Request $id)
-    {
-
-        $pengajuan = PengajuanSurat::findOrFail($id);
-        $pengajuan->approved_at_kaprodi = now();
-        $pengajuan->approved_at_dosen_pa = now();
-        $pengajuan->save();
-
-        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui oleh Dosen PA & Kaprodi.');
-
-    }
 
 
     // ================= Kaprodi =================
 
-    public function approveKaprodi($id)
-    {
-        $pengajuan = PengajuanSurat::findOrFail($id);
-        $pengajuan->approved_by_kaprodi = Auth::id();
-        $pengajuan->approved_at_kaprodi = now();
-        $pengajuan->save();
 
-        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui oleh Kaprodi.');
-    }
 
     public function rejectKaprodi(Request $request, $id)
     {
@@ -206,23 +351,17 @@ class PengajuanSuratController extends Controller
         $pengajuan = PengajuanSurat::findOrFail($id);
         $pengajuan->approved_by_kaprodi = null;
         $pengajuan->approved_at_kaprodi = null;
+        $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Kaprodi: ' . $request->alasan_reject;
         $pengajuan->save();
 
+        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Kaprodi.');
     }
 
     // ================= Wadek1 =================
 
-    public function approveWadek1($id)
-    {
-        $pengajuan = PengajuanSurat::findOrFail($id);
-        $pengajuan->approved_by_wadek1 = Auth::id();
-        $pengajuan->approved_at_wadek1 = now();
-        $pengajuan->save();
 
-        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui oleh Wadek 1.');
-    }
 
     public function rejectWadek1(Request $request, $id)
     {
@@ -233,23 +372,17 @@ class PengajuanSuratController extends Controller
         $pengajuan = PengajuanSurat::findOrFail($id);
         $pengajuan->approved_by_wadek1 = null;
         $pengajuan->approved_at_wadek1 = null;
+        $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Wadek 1: ' . $request->alasan_reject;
         $pengajuan->save();
 
+        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Wadek 1.');
     }
 
     // ================= Staff TU =================
 
-    public function approveStaffTU($id)
-    {
-        $pengajuan = PengajuanSurat::findOrFail($id);
-        $pengajuan->approved_by_staff_tu = Auth::id();
-        $pengajuan->approved_at_staff_tu = now();
-        $pengajuan->save();
 
-        return redirect()->back()->with('success', 'Pengajuan berhasil disetujui oleh Staff TU.');
-    }
 
     public function rejectStaffTU(Request $request, $id)
     {
@@ -260,9 +393,11 @@ class PengajuanSuratController extends Controller
         $pengajuan = PengajuanSurat::findOrFail($id);
         $pengajuan->approved_by_staff_tu = null;
         $pengajuan->approved_at_staff_tu = null;
+        $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Staff TU: ' . $request->alasan_reject;
         $pengajuan->save();
 
+        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Staff TU.');
     }
 }

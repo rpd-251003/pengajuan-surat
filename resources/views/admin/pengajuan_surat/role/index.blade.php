@@ -361,8 +361,8 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="reject_reason" class="form-label">Alasan Penolakan</label>
-                            <textarea class="form-control" name="reject_reason" id="reject_reason" rows="3" required></textarea>
+                            <label for="alasan_reject" class="form-label">Alasan Penolakan</label>
+                            <textarea class="form-control" name="alasan_reject" id="alasan_reject" rows="3" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -666,7 +666,7 @@
                 const form = document.getElementById('rejectForm');
 
                 // Update action URL sesuai level dan id
-                form.action = `/admin/pengajuan/${pengajuanId}/reject_${level}`;
+                form.action = `/data/pengajuan/${pengajuanId}/reject_${level}`;
             });
         });
     </script>

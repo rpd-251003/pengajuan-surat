@@ -56,4 +56,9 @@ class PengajuanSurat extends Model
     {
         return $this->belongsTo(User::class, 'approved_by_staff_tu');
     }
+
+    public function fileApproval()
+    {
+        return $this->hasOne(FileApproval::class, 'id_pengajuan');
+    }
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\JenisSuratController;
+use App\Http\Controllers\FileApprovalController;
 use App\Http\Controllers\DosenPaTahunanController;
 use App\Http\Controllers\KaprodiTahunanController;
 use App\Http\Controllers\PengajuanSuratController;
@@ -24,9 +25,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [HomeController::class, 'index_admin'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/prodi-by-fakultas/{fakultas_id}', [RegisteredUserController::class, 'getProdiByFakultas']);
 
@@ -44,7 +43,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':kaprodi'])->group(function 
 
 // Wadek
 Route::middleware(['auth', RoleMiddleware::class . ':wadek1'])->group(function () {
-    Route::get('/wadek1/dashboard', [WadekController::class, 'index'])->name('wadek.dashboard');
+    Route::get('/wadek1/dashboard', [HomeController::class, 'index_admin'])->name('wadek.dashboard');
     Route::post('/wadek1/approve/{id}', [WadekController::class, 'approve']);
     Route::post('/wadek1/reject/{id}', [WadekController::class, 'reject']);
 });
@@ -62,6 +61,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
     Route::get('/tu/laporan', [TuController::class, 'laporanBulanan'])->name('tu.laporan');
 
     Route::resource('users', UsersController::class);
+
+    Route::resource('file-approvals', FileApprovalController::class)->except(['create', 'edit', 'show']);
+    Route::get('/file-approvals/data', [FileApprovalController::class, 'data'])->name('file-approvals.data');
 
 
 
@@ -117,6 +119,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengajuan-surat/create', [PengajuanSuratController::class, 'create'])->name('pengajuan_surat.create');
     Route::post('/pengajuan-surat/store', [PengajuanSuratController::class, 'store'])->name('pengajuan_surat.store');
     Route::get('/pengajuan-surat/deskripsi', [PengajuanSuratController::class, 'getDeskripsi'])->name('pengajuan_surat.deskripsi');
+
+    Route::get('/dashboard/chart-data', [HomeController::class, 'chartData']);
+    Route::get('/dashboard/pending/{type}', [HomeController::class, 'pendingApprovalDetails']);
+    Route::get('/dashboard/stats', [HomeController::class, 'getStats']);
 });
 
 Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {

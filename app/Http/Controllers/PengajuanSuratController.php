@@ -6,7 +6,9 @@ use App\Models\Mahasiswa;
 use App\Models\JenisSurat;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
+use App\Models\PengajuanDetail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,56 +35,198 @@ class PengajuanSuratController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'jenis_surat' => 'required|string',
-            'keterangan' => 'nullable|string',
-        ]);
+        try {
+            // Log untuk debug
+            \Log::info('=== START PENGAJUAN SURAT ===');
+            \Log::info('Request data', $request->all());
 
-        // Validasi dynamic fields berdasarkan jenis surat
-        $this->validateDynamicFields($request);
+            $request->validate([
+                'jenis_surat' => 'required|string',
+                'keterangan' => 'nullable|string',
+            ]);
 
-        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+            \Log::info('Validation passed');
 
-        if (!$mahasiswa) {
-            return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
+            // Validasi dynamic fields berdasarkan jenis surat
+            $this->validateDynamicFields($request);
+
+            \Log::info('Dynamic fields validation passed');
+
+            $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
+
+            \Log::info('Mahasiswa found', $mahasiswa ? $mahasiswa->toArray() : ['mahasiswa' => 'NULL']);
+
+            if (!$mahasiswa) {
+                \Log::error('Mahasiswa not found', ['user_id' => Auth::id()]);
+                return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
+            }
+
+            // Cari Kaprodi berdasarkan tahun_angkatan dan prodi_id
+            $kaprodi = DB::table('kaprodi_tahunans')
+                ->where('tahun_angkatan', $mahasiswa->angkatan)
+                ->where('prodi_id', $mahasiswa->prodi_id)
+                ->first();
+
+            \Log::info('Kaprodi search result', $kaprodi ? (array)$kaprodi : ['kaprodi' => 'NULL']);
+
+            // Cari Dosen PA berdasarkan tahun_angkatan dan prodi_id
+            $dosenPa = DB::table('dosen_pa_tahunans')
+                ->where('tahun_angkatan', $mahasiswa->angkatan)
+                ->where('prodi_id', $mahasiswa->prodi_id)
+                ->first();
+
+            \Log::info('Dosen PA search result', $dosenPa ? (array)$dosenPa : ['dosen_pa' => 'NULL']);
+
+            // Validasi jika data kaprodi atau dosen PA tidak ditemukan
+            if (!$kaprodi) {
+                \Log::error('Kaprodi not found', [
+                    'angkatan' => $mahasiswa->angkatan,
+                    'prodi_id' => $mahasiswa->prodi_id
+                ]);
+                return redirect()->back()->with('error', 'Data Kaprodi untuk angkatan dan prodi Anda tidak ditemukan.');
+            }
+
+            if (!$dosenPa) {
+                \Log::error('Dosen PA not found', [
+                    'angkatan' => $mahasiswa->angkatan,
+                    'prodi_id' => $mahasiswa->prodi_id
+                ]);
+                return redirect()->back()->with('error', 'Data Dosen PA untuk angkatan dan prodi Anda tidak ditemukan.');
+            }
+
+            \Log::info('Starting to create pengajuan...');
+
+            // Create pengajuan surat
+            $pengajuan = PengajuanSurat::create([
+                'mahasiswa_id' => $mahasiswa->id,
+                'jenis_surat_id' => $request->jenis_surat,
+                'keterangan' => $request->keterangan,
+                'tahun_angkatan' => $mahasiswa->angkatan,
+                'prodi_id' => $mahasiswa->prodi_id,
+                'fakultas_id' => $mahasiswa->fakultas_id,
+                'approved_by_kaprodi' => $kaprodi->user_id,
+                'approved_by_dosen_pa' => $dosenPa->user_id,
+            ]);
+
+            \Log::info('Pengajuan created successfully', $pengajuan->toArray());
+
+            // Simpan detail pengajuan dengan auto fields
+            $this->storeDetailsWithAutoFields($request, $pengajuan->id);
+
+            \Log::info('Details stored successfully');
+            \Log::info('=== END PENGAJUAN SURAT SUCCESS ===');
+
+            return redirect()->route('pengajuan_surat.history')->with('success', 'Pengajuan surat berhasil dikirim.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error in store', ['errors' => $e->errors()]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error in store pengajuan surat', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Store pengajuan details with auto fields
+     */
+    /**
+     * Store pengajuan details with auto fields and file support
+     */
+    private function storeDetailsWithAutoFields(Request $request, $pengajuanId)
+    {
+        try {
+            $currentUser = Auth::user();
+            $mahasiswa = Mahasiswa::where('user_id', $currentUser->id)->first();
+
+            // Auto fields
+            $autoDetails = [
+                'nama' => $currentUser->name,
+                'nim' => $currentUser->nomor_identifikasi,
+                'fakultas' => $mahasiswa->fakultas->nama ?? '',
+                'prodi' => $mahasiswa->prodi->nama ?? '',
+                'angkatan' => $mahasiswa->angkatan ?? ''
+            ];
+
+            // User input
+            $excludedFields = ['_token', 'jenis_surat', 'keterangan'];
+            $userDetails = $request->except($excludedFields);
+
+            // Merge all details
+            $allDetails = array_merge($autoDetails, $userDetails);
+
+            // Get uploaded files
+            $uploadedFiles = $request->allFiles();
+
+            // Store details with file support
+            \App\Models\PengajuanDetail::storeDetails($pengajuanId, $allDetails, $uploadedFiles);
+        } catch (\Exception $e) {
+            \Log::error('Error storing details', [
+                'message' => $e->getMessage(),
+                'pengajuan_id' => $pengajuanId
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Download file
+     */
+    public function downloadFile($pengajuanId, $fieldName)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
+
+        // Check permission
+        $user = Auth::user();
+        if ($pengajuan->mahasiswa->user_id !== $user->id && !in_array($user->role, ['tu', 'wadek1', 'kaprodi', 'dosen'])) {
+            abort(403);
         }
 
-        // Cari Kaprodi berdasarkan tahun_angkatan dan prodi_id
-        $kaprodi = DB::table('kaprodi_tahunans')
-            ->where('tahun_angkatan', $mahasiswa->angkatan)
-            ->where('prodi_id', $mahasiswa->prodi_id)
-            ->first();
+        $detail = PengajuanDetail::where('pengajuan_surat_id', $pengajuanId)
+            ->where('field_name', $fieldName)
+            ->where('field_type', 'file')
+            ->firstOrFail();
 
-        // Cari Dosen PA berdasarkan tahun_angkatan dan prodi_id
-        $dosenPa = DB::table('dosen_pa_tahunans')
-            ->where('tahun_angkatan', $mahasiswa->angkatan)
-            ->where('prodi_id', $mahasiswa->prodi_id)
-            ->first();
+        $fileInfo = json_decode($detail->field_value, true);
+        $filePath = storage_path('app/public/' . $fileInfo['path']);
 
-        // Validasi jika data kaprodi atau dosen PA tidak ditemukan
-        if (!$kaprodi) {
-            return redirect()->back()->with('error', 'Data Kaprodi untuk angkatan dan prodi Anda tidak ditemukan.');
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan');
         }
 
-        if (!$dosenPa) {
-            return redirect()->back()->with('error', 'Data Dosen PA untuk angkatan dan prodi Anda tidak ditemukan.');
+        return response()->download($filePath, $fileInfo['original_name']);
+    }
+
+    /**
+     * View file
+     */
+    public function viewFile($pengajuanId, $fieldName)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($pengajuanId);
+
+        // Check permission
+        $user = Auth::user();
+        if ($pengajuan->mahasiswa->user_id !== $user->id && !in_array($user->role, ['tu', 'wadek1', 'kaprodi', 'dosen'])) {
+            abort(403);
         }
 
-        $pengajuan = PengajuanSurat::create([
-            'mahasiswa_id' => $mahasiswa->id,
-            'jenis_surat_id' => $request->jenis_surat,
-            'keterangan' => $request->keterangan,
-            'tahun_angkatan' => $mahasiswa->angkatan,
-            'prodi_id' => $mahasiswa->prodi_id,
-            'fakultas_id' => $mahasiswa->fakultas_id,
-            'approved_by_kaprodi' => $kaprodi->user_id,
-            'approved_by_dosen_pa' => $dosenPa->user_id,
-        ]);
+        $detail = PengajuanDetail::where('pengajuan_surat_id', $pengajuanId)
+            ->where('field_name', $fieldName)
+            ->where('field_type', 'file')
+            ->firstOrFail();
 
-        // Simpan detail pengajuan dengan auto fields
-        $this->storeDetailsWithAutoFields($request, $pengajuan->id);
+        $fileInfo = json_decode($detail->field_value, true);
+        $filePath = storage_path('app/public/' . $fileInfo['path']);
 
-        return redirect()->route('pengajuan_surat.history')->with('success', 'Pengajuan surat berhasil dikirim.');
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan');
+        }
+
+        return response()->file($filePath);
     }
 
     /**
@@ -90,72 +234,63 @@ class PengajuanSuratController extends Controller
      */
     private function validateDynamicFields(Request $request)
     {
-        $jenisSurat = JenisSurat::with('fields')->findOrFail($request->jenis_surat);
-        $rules = [];
-        $messages = [];
+        try {
+            \Log::info('=== START VALIDATE DYNAMIC FIELDS ===');
 
-        foreach ($jenisSurat->fields as $field) {
-            // Skip auto fields (nama, nim) karena sudah otomatis
-            if (in_array($field->field_name, ['nama', 'nim'])) {
-                continue;
-            }
+            $jenisSurat = JenisSurat::with('fields')->findOrFail($request->jenis_surat);
 
-            if ($field->is_required) {
-                if ($field->field_type === 'checkbox') {
-                    $rules[$field->field_name] = 'required|array|min:1';
-                    $messages[$field->field_name . '.required'] = $field->field_label . ' harus dipilih minimal 1 item.';
-                    $messages[$field->field_name . '.min'] = $field->field_label . ' harus dipilih minimal 1 item.';
-                } else {
-                    $rules[$field->field_name] = 'required';
-                    $messages[$field->field_name . '.required'] = $field->field_label . ' wajib diisi.';
+            \Log::info('Jenis surat found', $jenisSurat->toArray());
+
+            $rules = [];
+            $messages = [];
+
+            foreach ($jenisSurat->fields as $field) {
+                \Log::info('Processing field', $field->toArray());
+
+                // Skip auto fields (nama, nim) karena sudah otomatis
+                if (in_array($field->field_name, ['nama', 'nim'])) {
+                    continue;
+                }
+
+                if ($field->is_required) {
+                    if ($field->field_type === 'checkbox') {
+                        $rules[$field->field_name] = 'required|array|min:1';
+                        $messages[$field->field_name . '.required'] = $field->field_label . ' harus dipilih minimal 1 item.';
+                        $messages[$field->field_name . '.min'] = $field->field_label . ' harus dipilih minimal 1 item.';
+                    } else {
+                        $rules[$field->field_name] = 'required';
+                        $messages[$field->field_name . '.required'] = $field->field_label . ' wajib diisi.';
+                    }
+                }
+
+                // Add validation rules from field configuration
+                if ($field->validation_rules && is_array($field->validation_rules)) {
+                    $additionalRules = implode('|', $field->validation_rules);
+                    if (isset($rules[$field->field_name])) {
+                        $rules[$field->field_name] .= '|' . $additionalRules;
+                    } else {
+                        $rules[$field->field_name] = $additionalRules;
+                    }
                 }
             }
 
-            // Add validation rules from field configuration
-            if ($field->validation_rules && is_array($field->validation_rules)) {
-                $additionalRules = implode('|', $field->validation_rules);
-                if (isset($rules[$field->field_name])) {
-                    $rules[$field->field_name] .= '|' . $additionalRules;
-                } else {
-                    $rules[$field->field_name] = $additionalRules;
-                }
+            \Log::info('Validation rules', $rules);
+            \Log::info('Validation messages', $messages);
+
+            if (!empty($rules)) {
+                $request->validate($rules, $messages);
             }
-        }
 
-        if (!empty($rules)) {
-            $request->validate($rules, $messages);
-        }
-    }
-
-    /**
-     * Store pengajuan details with auto fields
-     */
-    private function storeDetailsWithAutoFields(Request $request, $pengajuanId)
-    {
-        $currentUser = Auth::user();
-        $mahasiswa = Mahasiswa::where('user_id', $currentUser->id)->first();
-
-        // Auto fields yang selalu ada
-        $autoDetails = [
-            'nama' => $currentUser->name,
-            'nim' => $currentUser->nomor_identifikasi,
-            'fakultas' => $mahasiswa->fakultas->nama ?? '',
-            'prodi' => $mahasiswa->prodi->nama ?? '',
-            'angkatan' => $mahasiswa->angkatan ?? ''
-        ];
-
-        // Get all input except excluded fields
-        $excludedFields = ['_token', 'jenis_surat', 'keterangan'];
-        $userDetails = $request->except($excludedFields);
-
-        // Merge auto fields dengan user input
-        $allDetails = array_merge($autoDetails, $userDetails);
-
-        if (!empty($allDetails)) {
-            \App\Models\PengajuanDetail::storeDetails($pengajuanId, $allDetails);
+            \Log::info('=== END VALIDATE DYNAMIC FIELDS SUCCESS ===');
+        } catch (\Exception $e) {
+            \Log::error('Error in validateDynamicFields', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            throw $e;
         }
     }
-
     /**
      * Get dynamic form fields for specific jenis surat
      */
@@ -165,7 +300,7 @@ class PengajuanSuratController extends Controller
         $jenisSurat = JenisSurat::with('fields')->findOrFail($jenisSuratId);
 
         // Filter out auto fields dari fields yang akan ditampilkan di form
-        $dynamicFields = $jenisSurat->fields->filter(function($field) {
+        $dynamicFields = $jenisSurat->fields->filter(function ($field) {
             return !in_array($field->field_name, ['nama', 'nim', 'fakultas', 'prodi', 'angkatan']);
         });
 
@@ -185,7 +320,7 @@ class PengajuanSuratController extends Controller
         }
 
         // Filter out auto fields
-        $dynamicFields = $data->fields->filter(function($field) {
+        $dynamicFields = $data->fields->filter(function ($field) {
             return !in_array($field->field_name, ['nama', 'nim', 'fakultas', 'prodi', 'angkatan']);
         });
 

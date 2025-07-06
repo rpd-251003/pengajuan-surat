@@ -20,7 +20,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
         id="main-font-link">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/tabler-icons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/fontawesome.css') }}">
@@ -33,7 +34,26 @@
 
 
 </head>
+<style>
+    input[type="file"] {
+        border: 2px dashed #dee2e6;
+        padding: 10px;
+        background: #f8f9fa;
+    }
 
+    input[type="file"]:hover {
+        border-color: #007bff;
+    }
+
+    .file-attachment {
+        transition: all 0.3s ease;
+    }
+
+    .file-attachment:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
 @stack('styles')
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="dark">

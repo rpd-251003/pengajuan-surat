@@ -58,7 +58,9 @@
                                     class="form-control @error('fakultas_id') is-invalid @enderror" required>
                                     <option value="">-- Pilih Fakultas --</option>
                                     @foreach ($fakultas as $f)
-                                        <option value="{{ $f->id }}">{{ $f->nama }}</option>
+                                        <option value="{{ $f->id }}" {{ old('fakultas_id', 1) == $f->id ? 'selected' : '' }}>
+                                            {{ $f->nama }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('fakultas_id')
@@ -69,7 +71,7 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">Program Studi</label>
                                 <select name="prodi_id" id="prodi"
-                                    class="form-control @error('prodi_id') is-invalid @enderror" required disabled>
+                                    class="form-control @error('prodi_id') is-invalid @enderror" required>
                                     <option value="">-- Pilih Program Studi --</option>
                                     <!-- Prodi akan di-load via AJAX -->
                                 </select>
@@ -77,7 +79,6 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
 
                             <div class="form-group mb-3">
                                 <label class="form-label">Angkatan</label>
@@ -174,8 +175,8 @@
     </script>
 
     <script>
-        document.getElementById('fakultas').addEventListener('change', function() {
-            const fakultasId = this.value;
+        // Function to load prodi based on fakultas
+        function loadProdi(fakultasId, selectedProdiId = null) {
             const prodiSelect = document.getElementById('prodi');
 
             if (!fakultasId) {
@@ -183,6 +184,10 @@
                 prodiSelect.disabled = true;
                 return;
             }
+
+            // Show loading state
+            prodiSelect.innerHTML = '<option value="">Loading...</option>';
+            prodiSelect.disabled = true;
 
             fetch(`/prodi-by-fakultas/${fakultasId}`)
                 .then(response => response.json())
@@ -192,18 +197,42 @@
                         const option = document.createElement('option');
                         option.value = prodi.id;
                         option.textContent = prodi.nama;
+
+                        // Set selected if this is the previously selected prodi
+                        if (selectedProdiId && selectedProdiId == prodi.id) {
+                            option.selected = true;
+                        }
+
                         prodiSelect.appendChild(option);
                     });
                     prodiSelect.disabled = false;
                 })
                 .catch(error => {
                     console.error('Error fetching prodi:', error);
-                    prodiSelect.innerHTML = '<option value="">-- Pilih Program Studi --</option>';
+                    prodiSelect.innerHTML = '<option value="">Error loading data</option>';
                     prodiSelect.disabled = true;
                 });
+        }
+
+        // Event listener for fakultas change
+        document.getElementById('fakultas').addEventListener('change', function() {
+            const fakultasId = this.value;
+            loadProdi(fakultasId);
+        });
+
+        // Auto-load prodi when page loads if fakultas is already selected
+        document.addEventListener('DOMContentLoaded', function() {
+            const fakultasSelect = document.getElementById('fakultas');
+            const selectedFakultasId = fakultasSelect.value;
+
+            // Get old prodi_id value if there was a validation error
+            const oldProdiId = "{{ old('prodi_id') }}";
+
+            if (selectedFakultasId) {
+                loadProdi(selectedFakultasId, oldProdiId || null);
+            }
         });
     </script>
-
 
 </body>
 <!-- [Body] end -->

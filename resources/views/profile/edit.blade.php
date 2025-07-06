@@ -56,6 +56,7 @@
                                         value="{{ old('nomor_identifikasi', $user->nomor_identifikasi) }}"
                                         autocomplete="off"
                                         placeholder="NIK/KTP/Passport"
+                                        disabled
                                     >
                                     @error('nomor_identifikasi')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -219,7 +220,7 @@
         </div>
     </div>
 
-    <!-- Delete Account Section -->
+    {{-- <!-- Delete Account Section -->
     <div class="row mb-4">
         <div class="col-lg-8">
             <div class="card border-danger">
@@ -252,7 +253,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <!-- Delete Account Modal -->

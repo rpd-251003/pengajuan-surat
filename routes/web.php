@@ -158,6 +158,13 @@ Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {
     Route::patch('/{id}/reject_staff_tu', [PengajuanSuratController::class, 'rejectStaffTU'])->name('admin.pengajuan.reject_staff_tu');
     Route::patch('/{id}/reject_double', [PengajuanSuratController::class, 'rejectDouble'])->name('admin.pengajuan.reject_double');
 });
+Route::middleware('auth')->group(function () {
+    // File operations
+    Route::get('/pengajuan/{pengajuanId}/file/{fieldName}/download', [PengajuanSuratController::class, 'downloadFile'])
+        ->name('pengajuan.file.download');
 
+    Route::get('/pengajuan/{pengajuanId}/file/{fieldName}/view', [PengajuanSuratController::class, 'viewFile'])
+        ->name('pengajuan.file.view');
+});
 
 require __DIR__ . '/auth.php';

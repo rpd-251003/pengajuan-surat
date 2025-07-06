@@ -382,7 +382,8 @@
 
                     case 'file':
                         fieldHtml += `<input type="file" class="form-control"
-                                     id="${field.field_name}" name="${field.field_name}" ${required}>`;
+                 id="${field.field_name}" name="${field.field_name}" ${required}>
+                 <small class="form-text text-muted">Maksimal 5MB</small>`;
                         break;
                 }
 
@@ -398,14 +399,32 @@
                     }, 600);
                 }
             }
-
+            $(document).on('change', 'input[type="file"]', function() {
+                const file = this.files[0];
+                if (file && file.size > 5 * 1024 * 1024) { // 5MB
+                    $(this).val('');
+                    alert('File terlalu besar! Maksimal 5MB.');
+                }
+            });
+            // Form validation before submit
+            // Replace the form submit handler in pengajuan_surat/create.blade.php
             // Form validation before submit
             $('#pengajuanSuratForm').on('submit', function(e) {
+                console.log('=== FORM SUBMIT START ===');
+
+                // Log all form data
+                let formData = new FormData(this);
+                console.log('Form data:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key + ': ' + value);
+                }
+
                 // Basic validation for required dynamic fields
                 let isValid = true;
                 let errorMessage = '';
 
                 $(this).find('input[required], select[required], textarea[required]').each(function() {
+                    console.log('Checking field:', $(this).attr('name'), 'Value:', $(this).val());
                     if (!$(this).val()) {
                         isValid = false;
                         $(this).addClass('is-invalid');
@@ -424,6 +443,12 @@
 
                     if (firstCheckbox.prop('required')) {
                         const isAnyChecked = checkboxes.is(':checked');
+                        console.log('Checkbox group validation:', {
+                            'name': firstCheckbox.attr('name'),
+                            'required': firstCheckbox.prop('required'),
+                            'anyChecked': isAnyChecked
+                        });
+
                         if (!isAnyChecked) {
                             isValid = false;
                             $(this).addClass('border-danger');
@@ -436,8 +461,14 @@
                     }
                 });
 
+                console.log('Validation result:', {
+                    isValid,
+                    errorMessage
+                });
+
                 if (!isValid) {
                     e.preventDefault();
+                    console.log('Validation failed, preventing submit');
                     Swal.fire({
                         icon: 'error',
                         title: 'Form tidak lengkap!',
@@ -446,6 +477,24 @@
                     });
                     return false;
                 }
+
+                // Check if jenis_surat is selected
+                const jenisSurat = $('#jenis_surat_input').val();
+                console.log('Jenis surat selected:', jenisSurat);
+
+                if (!jenisSurat) {
+                    e.preventDefault();
+                    console.log('No jenis surat selected');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Pilih Jenis Surat!',
+                        text: 'Harap pilih jenis surat terlebih dahulu.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+
+                console.log('=== FORM SUBMIT SUCCESS ===');
 
                 // Show loading state
                 submitBtn.prop('disabled', true).html(

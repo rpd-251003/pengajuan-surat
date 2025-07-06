@@ -67,9 +67,24 @@ class PengajuanSurat extends Model
         return $this->hasMany(PengajuanDetail::class);
     }
 
+    /**
+     * Get details as associative array
+     */
     public function getDetailsArray()
     {
-        return $this->details()->pluck('field_value', 'field_name')->toArray();
-    }
+        $details = [];
+        foreach ($this->details as $detail) {
+            $value = $detail->field_value;
 
+            // Try to decode JSON if it's an array field
+            if ($detail->field_type === 'array') {
+                $decoded = json_decode($value, true);
+                $details[$detail->field_name] = $decoded ?: $value;
+            } else {
+                $details[$detail->field_name] = $value;
+            }
+        }
+
+        return $details;
+    }
 }

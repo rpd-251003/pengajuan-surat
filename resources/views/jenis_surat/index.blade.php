@@ -17,6 +17,7 @@
                         <th>ID</th>
                         <th>Nama Jenis Surat</th>
                         <th>Deskripsi</th>
+                        <th>Jumlah Fields</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -75,6 +76,7 @@
                 {data: 'id', name: 'id'},
                 {data: 'nama', name: 'nama'},
                 {data: 'deskripsi', name: 'deskripsi'},
+                {data: 'fields_count', name: 'fields_count'},
                 {
                     data: 'action',
                     name: 'action',

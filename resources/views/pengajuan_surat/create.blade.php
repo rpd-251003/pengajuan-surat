@@ -5,7 +5,10 @@
         <div class="card card-body">
             <h3><i class="fas fa-file-alt me-2"></i>Pengajuan Surat</h3>
 
-            <form id="pengajuanSuratForm" method="POST" action="{{ route('pengajuan_surat.store') }}">
+
+
+            <form id="pengajuanSuratForm" method="POST" action="{{ route('pengajuan_surat.store') }}"
+                enctype="multipart/form-data">
                 @csrf
 
                 <!-- Hidden input untuk menyimpan jenis surat yang dipilih -->
@@ -16,14 +19,14 @@
                     <div class="row" id="jenis_surat_buttons">
                         @foreach ($jenisSurats as $surat)
                             <div class="col-md-4 col-sm-6 mb-3">
-                                <div class="surat-button p-3 rounded text-center"
-                                     data-id="{{ $surat->id }}"
-                                     data-nama="{{ $surat->nama }}">
+                                <div class="surat-button p-3 rounded text-center" data-id="{{ $surat->id }}"
+                                    data-nama="{{ $surat->nama }}">
                                     <div class="surat-icon">
                                         <i class="{{ $surat->icon ?? 'fas fa-file-alt' }} text-primary"></i>
                                     </div>
                                     <div class="fw-bold">{{ $surat->nama }}</div>
-                                    <small class="text-muted">{{ $surat->deskripsi_singkat ?? 'Klik untuk memilih' }}</small>
+                                    <small
+                                        class="text-muted">{{ $surat->deskripsi_singkat ?? 'Klik untuk memilih' }}</small>
                                 </div>
                             </div>
                         @endforeach
@@ -38,10 +41,53 @@
 
                 <div id="deskripsi_surat" class="mt-3"></div>
 
+                <!-- Dynamic Form Fields Container -->
+                <div id="dynamic_fields_container" style="display: none;">
+                    <h5 class="mb-3">
+                        <i class="fas fa-edit me-2"></i>Form Pengajuan
+                        <small class="text-muted">(Data nama dan NIM sudah otomatis terisi)</small>
+                    </h5>
+                    <!-- Info Mahasiswa (Auto Fields Preview) -->
+                    <div class="alert alert-light border-start border-primary border-4 mb-4">
+                        <h6 class="mb-3"><i class="fas fa-user me-2"></i>Informasi Mahasiswa</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <strong>Nama:</strong> {{ $userData['nama'] }}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>NIM:</strong> {{ $userData['nim'] }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <strong>Fakultas:</strong> {{ $userData['fakultas'] }}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Program Studi:</strong> {{ $userData['prodi'] }}
+                                </div>
+                                @if ($userData['angkatan'])
+                                    <div class="mb-2">
+                                        <strong>Angkatan:</strong> {{ $userData['angkatan'] }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Informasi ini akan otomatis terisi di setiap pengajuan surat.
+                        </small>
+                    </div>
+                    <div id="dynamic_fields"></div>
+                </div>
+
+
+
                 <div class="mb-3">
-                    <label for="keterangan" class="form-label fw-bold">Keterangan <span class="text-muted">(isi sesuai tata cara di atas)</span></label>
-                    <textarea class="form-control" id="keterangan" name="keterangan" rows="4" required
-                              placeholder="Masukkan keterangan sesuai jenis surat yang dipilih..."></textarea>
+                    <label for="keterangan" class="form-label fw-bold">Keterangan Tambahan <span
+                            class="text-muted">(opsional)</span></label>
+                    <textarea class="form-control" id="keterangan" name="keterangan" rows="4"
+                        placeholder="Masukkan keterangan tambahan jika diperlukan..."></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-lg" disabled id="submit_btn">
@@ -70,14 +116,14 @@
             border-color: #007bff;
             background: #f8f9fa;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,123,255,0.1);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
         }
 
         .surat-button.selected {
             border-color: #007bff;
             background: #e3f2fd;
             color: #007bff;
-            box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
         }
 
         .surat-icon {
@@ -89,13 +135,53 @@
             color: #007bff !important;
         }
 
-        #selected_surat_info {
+        #selected_surat_info,
+        #dynamic_fields_container {
             animation: fadeIn 0.3s ease;
         }
 
+        .dynamic-field {
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        .checkbox-group .form-check {
+            margin-bottom: 0.5rem;
+        }
+
+        .checkbox-group .form-check:last-child {
+            margin-bottom: 0;
+        }
+
+        .auto-field-info {
+            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
+            border-left: 4px solid #2196f3;
+        }
+
+        .border-start {
+            border-left-width: 0.25rem !important;
+        }
+
+        .border-4 {
+            border-width: 0.25rem !important;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @media (max-width: 768px) {
@@ -118,6 +204,11 @@
             const selectedInfo = $('#selected_surat_info');
             const selectedName = $('#selected_surat_name');
             const submitBtn = $('#submit_btn');
+            const dynamicFieldsContainer = $('#dynamic_fields_container');
+            const dynamicFields = $('#dynamic_fields');
+
+            // User data from server (for auto fields)
+            const userData = @json($userData);
 
             // Event handler untuk tombol jenis surat
             suratButtons.on('click', function() {
@@ -141,18 +232,17 @@
                 // Enable submit button
                 submitBtn.prop('disabled', false);
 
-                // Load deskripsi surat via AJAX
-                loadDeskripsiSurat(suratId);
+                // Load deskripsi surat dan form fields via AJAX
+                loadSuratData(suratId);
 
-                // Scroll otomatis ke textarea keterangan setelah delay singkat
-                // untuk memberi waktu load deskripsi
+                // Scroll otomatis ke dynamic fields setelah delay singkat
                 setTimeout(function() {
-                    scrollToKeterangan();
+                    scrollToDynamicFields();
                 }, 300);
             });
 
-            // Fungsi untuk load deskripsi surat
-            function loadDeskripsiSurat(jenisSuratId) {
+            // Fungsi untuk load deskripsi surat dan dynamic fields
+            function loadSuratData(jenisSuratId) {
                 if (jenisSuratId) {
                     $.ajax({
                         url: '{{ route('pengajuan_surat.deskripsi') }}',
@@ -169,35 +259,207 @@
                                     ${formattedDeskripsi}
                                 </div>`
                             );
+
+                            // Generate dynamic form fields (excluding auto fields)
+                            generateDynamicFields(response.fields);
                         },
                         error: function() {
                             $('#deskripsi_surat').html(
                                 '<div class="alert alert-warning">Gagal memuat deskripsi surat.</div>'
                             );
+                            dynamicFieldsContainer.hide();
                         }
                     });
                 } else {
                     $('#deskripsi_surat').html('');
+                    dynamicFieldsContainer.hide();
                 }
             }
 
-            // Fungsi untuk scroll ke textarea keterangan
-            function scrollToKeterangan() {
-                const keteranganTextarea = $('#keterangan');
+            // Generate dynamic form fields (excluding auto fields)
+            function generateDynamicFields(fields) {
+                if (!fields || fields.length === 0) {
+                    dynamicFieldsContainer.hide();
+                    return;
+                }
 
-                // Smooth scroll ke textarea
-                $('html, body').animate({
-                    scrollTop: keteranganTextarea.offset().top - 100 // offset 100px dari atas
-                }, 600, function() {
-                    // Setelah scroll selesai, fokus ke textarea
-                    keteranganTextarea.focus();
+                let html = '';
 
-                    // Untuk mobile, tampilkan keyboard
-                    if (window.innerWidth <= 768) {
-                        keteranganTextarea.click();
+                // Filter out auto fields yang sudah dihandle otomatis
+                const autoFields = ['nama', 'nim', 'fakultas', 'prodi', 'angkatan'];
+                const dynamicFieldsOnly = fields.filter(field => !autoFields.includes(field.field_name));
+
+                if (dynamicFieldsOnly.length === 0) {
+                    // Jika tidak ada dynamic fields, tampilkan pesan
+                    html = `<div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Semua data untuk surat ini sudah otomatis terisi dari profil Anda.
+                    </div>`;
+                } else {
+                    dynamicFieldsOnly.forEach(function(field) {
+                        html += generateFieldHtml(field);
+                    });
+                }
+
+                dynamicFields.html(html);
+                dynamicFieldsContainer.show();
+            }
+
+            // Generate HTML for individual field
+            function generateFieldHtml(field) {
+                const required = field.is_required ? 'required' : '';
+                const requiredMark = field.is_required ? '<span class="text-danger">*</span>' : '';
+                const placeholder = field.placeholder || '';
+
+                let fieldHtml = `<div class="dynamic-field">
+                    <label for="${field.field_name}" class="form-label fw-bold">
+                        ${field.field_label} ${requiredMark}
+                    </label>`;
+
+                switch (field.field_type) {
+                    case 'text':
+                    case 'email':
+                    case 'number':
+                        fieldHtml += `<input type="${field.field_type}" class="form-control"
+                                     id="${field.field_name}" name="${field.field_name}"
+                                     placeholder="${placeholder}" ${required}>`;
+                        break;
+
+                    case 'textarea':
+                        fieldHtml += `<textarea class="form-control" id="${field.field_name}"
+                                     name="${field.field_name}" rows="3"
+                                     placeholder="${placeholder}" ${required}></textarea>`;
+                        break;
+
+                    case 'select':
+                        fieldHtml += `<select class="form-select" id="${field.field_name}"
+                                     name="${field.field_name}" ${required}>
+                                     <option value="">Pilih...</option>`;
+                        if (field.field_options) {
+                            Object.entries(field.field_options).forEach(([key, value]) => {
+                                fieldHtml += `<option value="${key}">${value}</option>`;
+                            });
+                        }
+                        fieldHtml += `</select>`;
+                        break;
+
+                    case 'checkbox':
+                        fieldHtml += `<div class="checkbox-group">`;
+                        if (field.field_options) {
+                            Object.entries(field.field_options).forEach(([key, value]) => {
+                                fieldHtml += `<div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="${field.field_name}[]" value="${key}"
+                                           id="${field.field_name}_${key}" ${required}>
+                                    <label class="form-check-label" for="${field.field_name}_${key}">
+                                        ${value}
+                                    </label>
+                                </div>`;
+                            });
+                        }
+                        fieldHtml += `</div>`;
+
+                        // Add helper text for required checkboxes
+                        if (field.is_required) {
+                            fieldHtml += `<small class="form-text text-muted">Pilih minimal 1 item</small>`;
+                        }
+                        break;
+
+                    case 'radio':
+                        if (field.field_options) {
+                            Object.entries(field.field_options).forEach(([key, value]) => {
+                                fieldHtml += `<div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           name="${field.field_name}" value="${key}"
+                                           id="${field.field_name}_${key}" ${required}>
+                                    <label class="form-check-label" for="${field.field_name}_${key}">
+                                        ${value}
+                                    </label>
+                                </div>`;
+                            });
+                        }
+                        break;
+
+                    case 'file':
+                        fieldHtml += `<input type="file" class="form-control"
+                                     id="${field.field_name}" name="${field.field_name}" ${required}>`;
+                        break;
+                }
+
+                fieldHtml += `</div>`;
+                return fieldHtml;
+            }
+
+            // Fungsi untuk scroll ke dynamic fields
+            function scrollToDynamicFields() {
+                if (dynamicFieldsContainer.is(':visible')) {
+                    $('html, body').animate({
+                        scrollTop: dynamicFieldsContainer.offset().top - 100
+                    }, 600);
+                }
+            }
+
+            // Form validation before submit
+            $('#pengajuanSuratForm').on('submit', function(e) {
+                // Basic validation for required dynamic fields
+                let isValid = true;
+                let errorMessage = '';
+
+                $(this).find('input[required], select[required], textarea[required]').each(function() {
+                    if (!$(this).val()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                        const label = $(this).closest('.dynamic-field').find('label').text()
+                            .replace('*', '').trim();
+                        errorMessage += `${label} wajib diisi.\n`;
+                    } else {
+                        $(this).removeClass('is-invalid');
                     }
                 });
-            }
+
+                // Checkbox validation for required fields
+                $('.checkbox-group').each(function() {
+                    const checkboxes = $(this).find('input[type="checkbox"]');
+                    const firstCheckbox = checkboxes.first();
+
+                    if (firstCheckbox.prop('required')) {
+                        const isAnyChecked = checkboxes.is(':checked');
+                        if (!isAnyChecked) {
+                            isValid = false;
+                            $(this).addClass('border-danger');
+                            const label = $(this).closest('.dynamic-field').find('label').text()
+                                .replace('*', '').trim();
+                            errorMessage += `${label} harus dipilih minimal 1 item.\n`;
+                        } else {
+                            $(this).removeClass('border-danger');
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Form tidak lengkap!',
+                        text: 'Harap isi semua field yang wajib diisi:\n\n' + errorMessage,
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+
+                // Show loading state
+                submitBtn.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-2"></i>Mengirim...');
+            });
+
+            // Clear validation styling on input
+            $(document).on('input change', 'input, select, textarea', function() {
+                $(this).removeClass('is-invalid');
+            });
+
+            $(document).on('change', 'input[type="checkbox"]', function() {
+                $(this).closest('.checkbox-group').removeClass('border-danger');
+            });
         });
     </script>
 @endpush

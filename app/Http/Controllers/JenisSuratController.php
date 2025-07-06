@@ -15,14 +15,20 @@ class JenisSuratController extends Controller
 
     public function getData(Request $request)
     {
-        $query = JenisSurat::query();
+        $query = JenisSurat::withCount('fields');
 
         return DataTables::of($query)
             ->addColumn('action', function ($item) {
                 return '
+                    <a href="/jenis-surat-fields/' . $item->id . '" class="btn btn-sm btn-info" title="Kelola Fields">
+                        <i class="ti ti-settings"></i> Fields
+                    </a>
                     <button class="btn btn-sm btn-primary edit" data-id="' . $item->id . '">Edit</button>
                     <button class="btn btn-sm btn-danger delete" data-id="' . $item->id . '">Delete</button>
                 ';
+            })
+            ->addColumn('fields_count', function ($item) {
+                return $item->fields_count . ' fields';
             })
             ->rawColumns(['action'])
             ->make(true);

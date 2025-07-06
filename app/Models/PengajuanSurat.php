@@ -61,4 +61,15 @@ class PengajuanSurat extends Model
     {
         return $this->hasOne(FileApproval::class, 'id_pengajuan');
     }
+
+    public function details()
+    {
+        return $this->hasMany(PengajuanDetail::class);
+    }
+
+    public function getDetailsArray()
+    {
+        return $this->details()->pluck('field_value', 'field_name')->toArray();
+    }
+
 }

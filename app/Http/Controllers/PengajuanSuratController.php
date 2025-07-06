@@ -14,20 +14,33 @@ class PengajuanSuratController extends Controller
 {
     public function create()
     {
+        $jenisSurats = JenisSurat::with('fields')->get();
 
-        $jenisSurats = JenisSurat::all();
+        // Get current user data
+        $currentUser = Auth::user();
+        $mahasiswa = Mahasiswa::where('user_id', $currentUser->id)->first();
 
-        return view('pengajuan_surat.create', compact('jenisSurats'));
+        $userData = [
+            'nama' => $currentUser->name,
+            'nim' => $currentUser->nomor_identifikasi,
+            'fakultas' => $mahasiswa->fakultas->nama ?? '',
+            'prodi' => $mahasiswa->prodi->nama ?? '',
+            'angkatan' => $mahasiswa->angkatan ?? ''
+        ];
+
+        return view('pengajuan_surat.create', compact('jenisSurats', 'userData'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'jenis_surat' => 'required|string',
-            'keterangan' => 'required|string',
+            'keterangan' => 'nullable|string',
         ]);
 
-        // Simpan data pengajuan surat, contoh pakai user login atau mahasiswa_id statis (ubah sesuai kebutuhan)
+        // Validasi dynamic fields berdasarkan jenis surat
+        $this->validateDynamicFields($request);
+
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
 
         if (!$mahasiswa) {
@@ -66,20 +79,120 @@ class PengajuanSuratController extends Controller
             'approved_by_dosen_pa' => $dosenPa->user_id,
         ]);
 
+        // Simpan detail pengajuan dengan auto fields
+        $this->storeDetailsWithAutoFields($request, $pengajuan->id);
+
         return redirect()->route('pengajuan_surat.history')->with('success', 'Pengajuan surat berhasil dikirim.');
+    }
+
+    /**
+     * Validate dynamic fields based on jenis surat
+     */
+    private function validateDynamicFields(Request $request)
+    {
+        $jenisSurat = JenisSurat::with('fields')->findOrFail($request->jenis_surat);
+        $rules = [];
+        $messages = [];
+
+        foreach ($jenisSurat->fields as $field) {
+            // Skip auto fields (nama, nim) karena sudah otomatis
+            if (in_array($field->field_name, ['nama', 'nim'])) {
+                continue;
+            }
+
+            if ($field->is_required) {
+                if ($field->field_type === 'checkbox') {
+                    $rules[$field->field_name] = 'required|array|min:1';
+                    $messages[$field->field_name . '.required'] = $field->field_label . ' harus dipilih minimal 1 item.';
+                    $messages[$field->field_name . '.min'] = $field->field_label . ' harus dipilih minimal 1 item.';
+                } else {
+                    $rules[$field->field_name] = 'required';
+                    $messages[$field->field_name . '.required'] = $field->field_label . ' wajib diisi.';
+                }
+            }
+
+            // Add validation rules from field configuration
+            if ($field->validation_rules && is_array($field->validation_rules)) {
+                $additionalRules = implode('|', $field->validation_rules);
+                if (isset($rules[$field->field_name])) {
+                    $rules[$field->field_name] .= '|' . $additionalRules;
+                } else {
+                    $rules[$field->field_name] = $additionalRules;
+                }
+            }
+        }
+
+        if (!empty($rules)) {
+            $request->validate($rules, $messages);
+        }
+    }
+
+    /**
+     * Store pengajuan details with auto fields
+     */
+    private function storeDetailsWithAutoFields(Request $request, $pengajuanId)
+    {
+        $currentUser = Auth::user();
+        $mahasiswa = Mahasiswa::where('user_id', $currentUser->id)->first();
+
+        // Auto fields yang selalu ada
+        $autoDetails = [
+            'nama' => $currentUser->name,
+            'nim' => $currentUser->nomor_identifikasi,
+            'fakultas' => $mahasiswa->fakultas->nama ?? '',
+            'prodi' => $mahasiswa->prodi->nama ?? '',
+            'angkatan' => $mahasiswa->angkatan ?? ''
+        ];
+
+        // Get all input except excluded fields
+        $excludedFields = ['_token', 'jenis_surat', 'keterangan'];
+        $userDetails = $request->except($excludedFields);
+
+        // Merge auto fields dengan user input
+        $allDetails = array_merge($autoDetails, $userDetails);
+
+        if (!empty($allDetails)) {
+            \App\Models\PengajuanDetail::storeDetails($pengajuanId, $allDetails);
+        }
+    }
+
+    /**
+     * Get dynamic form fields for specific jenis surat
+     */
+    public function getFormFields(Request $request)
+    {
+        $jenisSuratId = $request->jenis_surat;
+        $jenisSurat = JenisSurat::with('fields')->findOrFail($jenisSuratId);
+
+        // Filter out auto fields dari fields yang akan ditampilkan di form
+        $dynamicFields = $jenisSurat->fields->filter(function($field) {
+            return !in_array($field->field_name, ['nama', 'nim', 'fakultas', 'prodi', 'angkatan']);
+        });
+
+        return response()->json([
+            'fields' => $dynamicFields,
+            'deskripsi' => $jenisSurat->deskripsi
+        ]);
     }
 
     public function getDeskripsi(Request $request)
     {
         $id = $request->jenis_surat;
-
-        $data = JenisSurat::find($id);
+        $data = JenisSurat::with('fields')->find($id);
 
         if (!$data) {
             return response()->json(['deskripsi' => 'Deskripsi tidak ditemukan.']);
         }
 
-        return response()->json(['deskripsi' => $data->deskripsi]);
+        // Filter out auto fields
+        $dynamicFields = $data->fields->filter(function($field) {
+            return !in_array($field->field_name, ['nama', 'nim', 'fakultas', 'prodi', 'angkatan']);
+        });
+
+        return response()->json([
+            'deskripsi' => $data->deskripsi,
+            'fields' => $dynamicFields
+        ]);
     }
 
     // Method untuk menampilkan history pengajuan surat mahasiswa
@@ -92,12 +205,13 @@ class PengajuanSuratController extends Controller
         }
 
         $pengajuanSurats = PengajuanSurat::with([
-            'jenisSurat',
+            'jenisSurat.fields',
             'dosenPA',
             'kaprodi',
             'wadek1',
             'staffTU',
-            'fileApproval'
+            'fileApproval',
+            'details'
         ])
             ->where('mahasiswa_id', $mahasiswa->id)
             ->orderBy('created_at', 'desc')
@@ -144,7 +258,6 @@ class PengajuanSuratController extends Controller
             $query->where('status', $request->status);
         }
 
-
         $pengajuanSurats = $query->orderBy('created_at', 'desc')->paginate(5);
 
         // Get unique jenis surat for filter dropdown
@@ -160,7 +273,6 @@ class PengajuanSuratController extends Controller
 
     public function index_dosen()
     {
-
         $login_id = Auth::user()->id;
         $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])
             ->where(function ($query) use ($login_id) {
@@ -173,8 +285,7 @@ class PengajuanSuratController extends Controller
         return view('admin.pengajuan_surat.role.index', compact('pengajuanSurats'));
     }
 
-
-    // ================= Dosen PA =================
+    // ================= Approval Methods (unchanged) =================
 
     private function updateStatusAfterApproval(PengajuanSurat $pengajuan, $currentApprover = null)
     {
@@ -206,31 +317,24 @@ class PengajuanSuratController extends Controller
         $pengajuan->save();
     }
 
-
     public function approveDouble($id)
     {
         $pengajuan = PengajuanSurat::findOrFail($id);
 
-        // Cek apakah sebelumnya sudah disetujui
         if ($pengajuan->approved_at_dosen_pa && $pengajuan->approved_at_kaprodi) {
             return redirect()->back()->with('error', 'Sudah disetujui oleh Dosen PA dan Kaprodi sebelumnya.');
         }
 
         $pengajuan->approved_by_dosen_pa = Auth::id();
         $pengajuan->approved_at_dosen_pa = now();
-
         $pengajuan->approved_by_kaprodi = Auth::id();
         $pengajuan->approved_at_kaprodi = now();
-
         $pengajuan->save();
 
-        // Evaluasi status setelah approve ganda
-        $this->updateStatusAfterApproval($pengajuan, null); // null karena 2 sekaligus
+        $this->updateStatusAfterApproval($pengajuan, null);
 
         return redirect()->back()->with('success', 'Disetujui oleh Dosen PA & Kaprodi.');
     }
-
-
 
     public function approveDosenPA($id)
     {
@@ -300,6 +404,7 @@ class PengajuanSuratController extends Controller
         return redirect()->back()->with('success', 'Disetujui oleh Staff TU.');
     }
 
+    // ================= Reject Methods (unchanged) =================
 
     public function rejectDosenPA(Request $request, $id)
     {
@@ -310,12 +415,10 @@ class PengajuanSuratController extends Controller
         $pengajuan = PengajuanSurat::findOrFail($id);
         $pengajuan->approved_by_dosen_pa = null;
         $pengajuan->approved_at_dosen_pa = null;
-        // update keterangan dengan alasan reject
         $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Dosen PA: ' . $request->alasan_reject;
         $pengajuan->save();
 
-        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Dosen PA.');
     }
 
@@ -328,20 +431,12 @@ class PengajuanSuratController extends Controller
         $pengajuan = PengajuanSurat::findOrFail($id);
         $pengajuan->approved_at_kaprodi = null;
         $pengajuan->approved_at_dosen_pa = null;
-        // update keterangan dengan alasan reject
         $pengajuan->status = 'ditolak';
         $pengajuan->keterangan = 'Ditolak oleh Dosen PA / Kaprodi: ' . $request->alasan_reject;
         $pengajuan->save();
 
-        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Dosen PA.');
     }
-
-
-
-    // ================= Kaprodi =================
-
-
 
     public function rejectKaprodi(Request $request, $id)
     {
@@ -356,13 +451,8 @@ class PengajuanSuratController extends Controller
         $pengajuan->keterangan = 'Ditolak oleh Kaprodi: ' . $request->alasan_reject;
         $pengajuan->save();
 
-        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Kaprodi.');
     }
-
-    // ================= Wadek1 =================
-
-
 
     public function rejectWadek1(Request $request, $id)
     {
@@ -377,13 +467,8 @@ class PengajuanSuratController extends Controller
         $pengajuan->keterangan = 'Ditolak oleh Wadek 1: ' . $request->alasan_reject;
         $pengajuan->save();
 
-        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Wadek 1.');
     }
-
-    // ================= Staff TU =================
-
-
 
     public function rejectStaffTU(Request $request, $id)
     {
@@ -398,7 +483,6 @@ class PengajuanSuratController extends Controller
         $pengajuan->keterangan = 'Ditolak oleh Staff TU: ' . $request->alasan_reject;
         $pengajuan->save();
 
-        $pengajuan->status = 'diproses';
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Staff TU.');
     }
 }

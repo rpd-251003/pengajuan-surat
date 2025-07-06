@@ -18,6 +18,7 @@ use App\Http\Controllers\FileApprovalController;
 use App\Http\Controllers\DosenPaTahunanController;
 use App\Http\Controllers\KaprodiTahunanController;
 use App\Http\Controllers\PengajuanSuratController;
+use App\Http\Controllers\JenisSuratFieldController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
 
@@ -65,6 +66,15 @@ Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
     Route::resource('file-approvals', FileApprovalController::class)->except(['create', 'edit', 'show']);
     Route::get('/file-approvals/data', [FileApprovalController::class, 'data'])->name('file-approvals.data');
 
+    Route::prefix('jenis-surat-fields')->group(function () {
+        Route::get('/{jenisSuratId}', [JenisSuratFieldController::class, 'index'])->name('jenis-surat-fields.index');
+        Route::post('/', [JenisSuratFieldController::class, 'store'])->name('jenis-surat-fields.store');
+        Route::get('/{id}/show', [JenisSuratFieldController::class, 'show']);
+        Route::delete('/{id}', [JenisSuratFieldController::class, 'destroy']);
+    });
+
+    // API route for getting fields by jenis surat
+    Route::get('/api/jenis-surat/{jenisSuratId}/fields', [JenisSuratFieldController::class, 'getFields'])->name('api.jenis-surat.fields');
 
 
     Route::resource('kaprodi-tahunan', KaprodiTahunanController::class);
@@ -77,6 +87,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
         Route::get('/{id}', [JenisSuratController::class, 'show']);
         Route::delete('/{id}', [JenisSuratController::class, 'destroy']);
     });
+
+    Route::get('/api/jenis-surat/{jenisSuratId}/fields', [JenisSuratFieldController::class, 'getFields'])->name('api.jenis-surat.fields');
+
 
     // Fakultas
     Route::get('fakultas-data', [FakultasController::class, 'getData'])->name('fakultas.data');
@@ -119,6 +132,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengajuan-surat/create', [PengajuanSuratController::class, 'create'])->name('pengajuan_surat.create');
     Route::post('/pengajuan-surat/store', [PengajuanSuratController::class, 'store'])->name('pengajuan_surat.store');
     Route::get('/pengajuan-surat/deskripsi', [PengajuanSuratController::class, 'getDeskripsi'])->name('pengajuan_surat.deskripsi');
+    Route::get('/pengajuan-surat/form-fields', [PengajuanSuratController::class, 'getFormFields'])->name('pengajuan_surat.form_fields');
+
 
     Route::get('/dashboard/chart-data', [HomeController::class, 'chartData']);
     Route::get('/dashboard/pending/{type}', [HomeController::class, 'pendingApprovalDetails']);

@@ -15,4 +15,18 @@ class JenisSurat extends Model
     {
         return $this->hasMany(PengajuanSurat::class);
     }
+
+    public function fields()
+    {
+        return $this->hasMany(JenisSuratField::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get fields for dynamic form
+     */
+    public function getFormFields()
+    {
+        return $this->fields()->get();
+    }
+
 }

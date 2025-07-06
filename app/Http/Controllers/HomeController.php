@@ -41,12 +41,11 @@ class HomeController extends Controller
             'ditolak' => 0,
         ];
 
-        $query = PengajuanSurat::query();
 
         $query = PengajuanSurat::query();
 
         // Jika user adalah dosen, cari tahu dia berperan sebagai Dosen PA atau Kaprodi
-        if ($user->role === 'dosen') {
+        if ($user->role == 'dosen') {
             $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
             $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
 
@@ -78,7 +77,7 @@ class HomeController extends Controller
 
         // 4. List penanggung jawab untuk Dosen PA
         $dosenPAList = collect();
-        if ($user->role === 'tu') {
+        if ($user->role == 'tu') {
             $dosenPAList = PengajuanSurat::select('approved_by_dosen_pa')
                 ->with(['dosenPA:id,name'])
                 ->whereNull('approved_at_dosen_pa')
@@ -124,7 +123,7 @@ class HomeController extends Controller
         $chartQuery = PengajuanSurat::query()
             ->whereBetween('created_at', [$thirtyDaysAgo, $today]);
 
-        if ($user->role === 'dosen') {
+        if ($user->role == 'dosen') {
             // Deteksi apakah user adalah Dosen PA atau Kaprodi dari data pengajuan
             $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
             $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
@@ -154,7 +153,7 @@ class HomeController extends Controller
 
         // 7. Total surat
         $totalSuratQuery = PengajuanSurat::query();
-        if ($user->role === 'dosen') {
+        if ($user->role == 'dosen') {
             $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
             $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
 

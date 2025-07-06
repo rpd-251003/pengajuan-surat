@@ -679,7 +679,7 @@
                                             <strong>Mahasiswa:</strong> {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
                                         </div>
                                         <div class="mb-2">
-                                            <strong>NIM:</strong> {{ $pengajuan->mahasiswa->nim ?? 'N/A' }}
+                                            <strong>NIM:</strong> {{ $pengajuan->mahasiswa->user->nomor_identifikasi ?? 'N/A' }}
                                         </div>
                                         <div class="mb-2">
                                             <strong>Prodi:</strong> {{ $pengajuan->mahasiswa->prodi->nama ?? 'N/A' }}
@@ -1106,7 +1106,7 @@
                 let form = document.getElementById('rejectForm');
 
                 // Update action URL sesuai level dan id
-                form.action = `/admin/pengajuan/${pengajuanId}/reject_${level}`;
+                form.action = `/data/pengajuan/${pengajuanId}/reject_${level}`;
             });
         });
     </script>

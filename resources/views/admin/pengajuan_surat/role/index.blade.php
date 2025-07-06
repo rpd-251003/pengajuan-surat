@@ -459,7 +459,7 @@
                                             <strong>Mahasiswa:</strong> {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
                                         </div>
                                         <div class="mb-2">
-                                            <strong>NIM:</strong> {{ $pengajuan->mahasiswa->nim ?? 'N/A' }}
+                                            <strong>NIM:</strong> {{ $pengajuan->user->nomor_identifikasi ?? 'N/A' }}
                                         </div>
                                         <div class="mb-2">
                                             <strong>Prodi:</strong> {{ $pengajuan->mahasiswa->prodi->nama ?? 'N/A' }}

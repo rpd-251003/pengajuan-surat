@@ -102,7 +102,7 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label">NIM</label>
-                                <input type="text" name="ni"
+                                <input type="number" maxlength="10" name="ni"
                                     class="form-control @error('ni') is-invalid @enderror" required
                                     value="{{ old('ni') }}">
                                 @error('ni')

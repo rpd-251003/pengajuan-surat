@@ -47,7 +47,7 @@
         </div>
         <div class="col-md-6">
             <div class="mb-3">
-                <label for="nomor_identifikasi" class="form-label">Nomor Identifikasi</label>
+                <label for="nomor_identifikasi" class="form-label">NIM atau NIP / NIDN</label>
                 <input type="text" class="form-control" id="nomor_identifikasi" name="nomor_identifikasi" value="{{ $user->nomor_identifikasi }}" placeholder="NIP/NIM/NIDN">
             </div>
         </div>

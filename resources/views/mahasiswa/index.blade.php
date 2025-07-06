@@ -14,7 +14,11 @@
                     <tr>
                         <th>Nama</th>
                         <th>Email</th>
-                        <th>Nomor Identifikasi</th>
+                        <th> @if (Auth::user()->role == 'mahasiswa')
+                                                NIM
+                                            @else
+                                                NIP / NIDN
+                                            @endif</th>
                         <th>Fakultas</th>
                         <th>Prodi</th>
                         <th>Angkatan</th>

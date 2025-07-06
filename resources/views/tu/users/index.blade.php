@@ -19,7 +19,7 @@
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th>Nomor Identifikasi</th>
+                                    <th>NIM / NIP / NIDN</th>
                                     <th>Tanggal Dibuat</th>
                                     <th width="15%">Action</th>
                                 </tr>

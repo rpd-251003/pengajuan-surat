@@ -19,10 +19,10 @@ class DosenPaTahunanController extends Controller
                 ->addIndexColumn()
                 ->addColumn('prodi', fn($row) => $row->prodi->nama ?? '-')
                 ->addColumn('user', fn($row) => $row->user->name ?? '-')
-                ->addColumn('action', function($row){
+                ->addColumn('action', function ($row) {
                     return '
-                        <button class="btn btn-sm btn-primary edit" data-id="'.$row->id.'">Edit</button>
-                        <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>
+                        <button class="btn btn-sm btn-primary edit" data-id="' . $row->id . '">Edit</button>
+                        <button class="btn btn-sm btn-danger delete" data-id="' . $row->id . '">Delete</button>
                     ';
                 })
                 ->rawColumns(['action'])
@@ -30,7 +30,7 @@ class DosenPaTahunanController extends Controller
         }
 
         $prodis = Prodi::all();
-        $users = User::all();
+        $users = User::where('role', '!=', 'mahasiswa')->get();
 
         return view('dosen_pa_tahunan.index', compact('prodis', 'users'));
     }

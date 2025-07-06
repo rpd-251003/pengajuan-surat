@@ -282,7 +282,7 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand" href="#">
-        <img src="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png" alt="Logo Universitas Darma Persada" />
+        <img src="https://r-code.online/img/unsada-logo.png" alt="Logo Universitas Darma Persada" />
         Universitas Darma Persada
       </a>
     </div>

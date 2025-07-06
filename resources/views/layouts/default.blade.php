@@ -70,7 +70,7 @@
             <div class="m-header">
                 <a href="{{ route('dashboard') }}" class="b-brand mt-3 text-primary">
                     <!-- ========   Change your logo from here   ============ -->
-                    <h5> <img src="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png"
+                    <h5> <img src="https://r-code.online/img/unsada-logo.png"
                             width="30" alt=""> SPS</h5>
                 </a>
             </div>

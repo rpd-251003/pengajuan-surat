@@ -707,11 +707,8 @@
                                                                                     KB
                                                                                     <span class="mx-2">•</span>
                                                                                     <i class="fas fa-calendar me-1"></i>
-                                                                                    @try
-                                                                                        {{ $fileInfo['uploaded_at'] }}
-                                                                                        @catch(\Exception $e)
-                                                                                        {{ $fileInfo['uploaded_at'] ?? 'N/A' }}
-                                                                                    @endtry
+                                                                                    {{ $fileInfo['uploaded_at'] }}
+
                                                                                 </small>
                                                                             </div>
                                                                             <div class="text-end">

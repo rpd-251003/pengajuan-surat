@@ -679,7 +679,8 @@
                                             <strong>Mahasiswa:</strong> {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
                                         </div>
                                         <div class="mb-2">
-                                            <strong>NIM:</strong> {{ $pengajuan->mahasiswa->user->nomor_identifikasi ?? 'N/A' }}
+                                            <strong>NIM:</strong>
+                                            {{ $pengajuan->mahasiswa->user->nomor_identifikasi ?? 'N/A' }}
                                         </div>
                                         <div class="mb-2">
                                             <strong>Prodi:</strong> {{ $pengajuan->mahasiswa->prodi->nama ?? 'N/A' }}
@@ -927,11 +928,8 @@
                                                                                     KB
                                                                                     <span class="mx-2">•</span>
                                                                                     <i class="fas fa-calendar me-1"></i>
-                                                                                    @try
-                                                                                        {{ $fileInfo['uploaded_at'] }}
-                                                                                        @catch(\Exception $e)
-                                                                                        {{ $fileInfo['uploaded_at'] ?? 'N/A' }}
-                                                                                    @endtry
+                                                                                    {{ $fileInfo['uploaded_at'] }}
+
                                                                                 </small>
                                                                             </div>
                                                                             <div class="text-end">

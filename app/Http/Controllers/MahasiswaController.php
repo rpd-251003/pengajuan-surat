@@ -19,18 +19,11 @@ class MahasiswaController extends Controller
         if ($request->ajax()) {
             $data = Mahasiswa::with(['user', 'fakultas', 'prodi'])->get();
             return DataTables::of($data)
-                ->addColumn('aksi', function ($row) {
-                    return '
-                    <button class="btn btn-sm btn-primary edit" data-id="' . $row->id . '">Edit</button>
-                    <button class="btn btn-sm btn-danger delete" data-id="' . $row->id . '">Hapus</button>
-                ';
-                })
                 ->addColumn('user.name', fn($row) => $row->user->name ?? '-')
                 ->addColumn('user.email', fn($row) => $row->user->email ?? '-')
                 ->addColumn('user.nomor_identifikasi', fn($row) => $row->user->nomor_identifikasi ?? '-')
                 ->addColumn('fakultas.nama', fn($row) => $row->fakultas->nama ?? '-')
                 ->addColumn('prodi.nama', fn($row) => $row->prodi->nama ?? '-')
-                ->rawColumns(['aksi'])
                 ->make(true);
         }
 

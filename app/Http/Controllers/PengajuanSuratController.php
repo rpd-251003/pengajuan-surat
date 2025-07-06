@@ -620,4 +620,41 @@ class PengajuanSuratController extends Controller
 
         return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh Staff TU.');
     }
+
+    public function uploadSurat(Request $request, $id)
+    {
+        $request->validate([
+            'nomor_surat' => 'required|string|max:255',
+            'file_surat' => 'required|file|mimes:pdf,doc,docx|max:10240'
+        ]);
+
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        // Check if user has TU role
+        if (!Auth::user()->hasRole('tu')) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk upload surat.');
+        }
+
+        try {
+            // Store the file
+            $filePath = $request->file('file_surat')->store('surat_files', 'public');
+
+            // Create or update file approval
+            \App\Models\FileApproval::updateOrCreate(
+                ['id_pengajuan' => $pengajuan->id],
+                [
+                    'nomor_surat' => $request->nomor_surat,
+                    'file_surat' => $filePath
+                ]
+            );
+
+            return redirect()->back()->with('success', 'Surat berhasil diupload.');
+        } catch (\Exception $e) {
+            \Log::error('Error uploading surat', [
+                'message' => $e->getMessage(),
+                'pengajuan_id' => $id
+            ]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat upload surat.');
+        }
+    }
 }

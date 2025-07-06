@@ -25,17 +25,48 @@ class HomeController extends Controller
 
     public function index_admin()
     {
-        // 1. Count total users dan mahasiswa
+        $user = Auth::user();
+
+        // 1. Count total users dan mahasiswa (hanya untuk admin)
+
         $totalUsers = User::count();
         $totalMahasiswa = User::where('role', 'mahasiswa')->count();
 
+
         // 2. Count surat berdasarkan status
         $statusCounts = [
-            'diajukan' => PengajuanSurat::where('status', 'diajukan')->count(),
-            'diproses' => PengajuanSurat::where('status', 'diproses')->count(),
-            'disetujui' => PengajuanSurat::where('status', 'disetujui')->count(),
-            'ditolak' => PengajuanSurat::where('status', 'ditolak')->count(),
+            'diajukan' => 0,
+            'diproses' => 0,
+            'disetujui' => 0,
+            'ditolak' => 0,
         ];
+
+        $query = PengajuanSurat::query();
+
+        $query = PengajuanSurat::query();
+
+        // Jika user adalah dosen, cari tahu dia berperan sebagai Dosen PA atau Kaprodi
+        if ($user->role === 'dosen') {
+            $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
+            $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
+
+            if ($isDosenPA) {
+                $query->where('approved_by_dosen_pa', $user->id);
+            } elseif ($isKaprodi) {
+                $query->where('approved_by_kaprodi', $user->id);
+            }
+        }
+
+
+        $statusCounts = $query->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        // Normalisasi agar tetap lengkap (jika ada yang kosong)
+        foreach (['diajukan', 'diproses', 'disetujui', 'ditolak'] as $status) {
+            $statusCounts[$status] = $statusCounts[$status] ?? 0;
+        }
 
         // 3. Count surat yang belum di-approve per role
         $pendingApprovals = [
@@ -45,59 +76,73 @@ class HomeController extends Controller
             'staff_tu' => PengajuanSurat::whereNull('approved_at_staff_tu')->count(),
         ];
 
-        // 4. List penanggung jawab untuk Dosen PA (dengan count pending)
-        $dosenPAList = PengajuanSurat::select('approved_by_dosen_pa')
-            ->with(['dosenPA:id,name'])
-            ->whereNotNull('approved_by_dosen_pa')
-            ->whereNull('approved_at_dosen_pa')
-            ->groupBy('approved_by_dosen_pa')
-            ->selectRaw('approved_by_dosen_pa, COUNT(*) as pending_count')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'user_id' => $item->approved_by_dosen_pa,
-                    'name' => $item->dosenPA->name ?? 'Unknown',
-                    'pending_count' => $item->pending_count
-                ];
-            });
+        // 4. List penanggung jawab untuk Dosen PA
+        $dosenPAList = collect();
+        if ($user->role === 'tu') {
+            $dosenPAList = PengajuanSurat::select('approved_by_dosen_pa')
+                ->with(['dosenPA:id,name'])
+                ->whereNull('approved_at_dosen_pa')
+                ->groupBy('approved_by_dosen_pa')
+                ->selectRaw('approved_by_dosen_pa, COUNT(*) as pending_count')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'user_id' => $item->approved_by_dosen_pa,
+                        'name' => $item->dosenPA->name ?? 'Unknown',
+                        'pending_count' => $item->pending_count
+                    ];
+                });
+        }
 
-        // 5. List penanggung jawab untuk Kaprodi (dengan count pending)
-        $kaprodiList = PengajuanSurat::select('approved_by_kaprodi')
-            ->with(['kaprodi:id,name'])
-            ->whereNotNull('approved_by_kaprodi')
-            ->whereNull('approved_at_kaprodi')
-            ->groupBy('approved_by_kaprodi')
-            ->selectRaw('approved_by_kaprodi, COUNT(*) as pending_count')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'user_id' => $item->approved_by_kaprodi,
-                    'name' => $item->kaprodi->name ?? 'Unknown',
-                    'pending_count' => $item->pending_count
-                ];
-            });
+        // 5. List penanggung jawab untuk Kaprodi
+        $kaprodiList = collect();
+        if ($user->role === 'tu') {
+            $kaprodiList = PengajuanSurat::select('approved_by_kaprodi')
+                ->with(['kaprodi:id,name'])
+                ->whereNull('approved_at_kaprodi')
+                ->groupBy('approved_by_kaprodi')
+                ->selectRaw('approved_by_kaprodi, COUNT(*) as pending_count')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'user_id' => $item->approved_by_kaprodi,
+                        'name' => $item->kaprodi->name ?? 'Unknown',
+                        'pending_count' => $item->pending_count
+                    ];
+                });
+        }
 
-        // 6. Grafik surat yang dibuat per hari (30 hari terakhir)
+        // 6. Grafik surat per hari (30 hari terakhir)
         $thirtyDaysAgo = Carbon::now()->subDays(29)->startOfDay();
         $today = Carbon::now()->endOfDay();
 
-        // Generate semua tanggal dalam 30 hari terakhir
         $dateRange = [];
         for ($date = $thirtyDaysAgo->copy(); $date->lte($today); $date->addDay()) {
             $dateRange[] = $date->format('Y-m-d');
         }
 
-        // Ambil data surat yang dibuat dalam 30 hari terakhir
-        $suratPerDay = PengajuanSurat::select(
-            DB::raw('DATE(created_at) as date'),
-            DB::raw('COUNT(*) as count')
-        )
-            ->whereBetween('created_at', [$thirtyDaysAgo, $today])
+        $chartQuery = PengajuanSurat::query()
+            ->whereBetween('created_at', [$thirtyDaysAgo, $today]);
+
+        if ($user->role === 'dosen') {
+            // Deteksi apakah user adalah Dosen PA atau Kaprodi dari data pengajuan
+            $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
+            $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
+
+            if ($isDosenPA) {
+                $chartQuery->where('approved_by_dosen_pa', $user->id);
+            } elseif ($isKaprodi) {
+                $chartQuery->where('approved_by_kaprodi', $user->id);
+            }
+        }
+
+
+        $suratPerDay = $chartQuery
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
             ->groupBy(DB::raw('DATE(created_at)'))
             ->pluck('count', 'date')
             ->toArray();
 
-        // Gabungkan dengan tanggal kosong (count = 0)
         $chartData = [];
         foreach ($dateRange as $date) {
             $chartData[] = [
@@ -107,25 +152,48 @@ class HomeController extends Controller
             ];
         }
 
-        // 7. Total surat yang diajukan
-        $totalSurat = PengajuanSurat::count();
+        // 7. Total surat
+        $totalSuratQuery = PengajuanSurat::query();
+        if ($user->role === 'dosen') {
+            $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
+            $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
 
-        // 8. Surat terbaru (5 terakhir) untuk informasi tambahan
-        $recentSurat = PengajuanSurat::with(['mahasiswa.user:id,name', 'jenisSurat:id,nama'])
+            if ($isDosenPA) {
+                $totalSuratQuery->where('approved_by_dosen_pa', $user->id);
+            } elseif ($isKaprodi) {
+                $totalSuratQuery->where('approved_by_kaprodi', $user->id);
+            }
+        }
+
+        $totalSurat = $totalSuratQuery->count();
+
+        // 8. Surat terbaru
+        $recentQuery = PengajuanSurat::with(['mahasiswa.user:id,name', 'jenisSurat:id,nama'])
             ->orderBy('id', 'desc')
-            ->limit(5)
-            ->get()
-            ->map(function ($surat) {
-                return [
-                    'id' => $surat->id,
-                    'mahasiswa_name' => $surat->mahasiswa->user->name ?? 'Unknown',
-                    'jenis_surat' => $surat->jenisSurat->nama ?? 'Unknown',
-                    'status' => $surat->status,
-                    'created_at' => $surat->created_at->format('d M Y H:i'),
-                ];
-            });
+            ->limit(5);
 
-        // 9. Progress approval (berapa persen yang sudah complete)
+        if ($user->role === 'dosen') {
+            $isDosenPA = PengajuanSurat::where('approved_by_dosen_pa', $user->id)->exists();
+            $isKaprodi = PengajuanSurat::where('approved_by_kaprodi', $user->id)->exists();
+
+            if ($isDosenPA) {
+                $recentQuery->where('approved_by_dosen_pa', $user->id);
+            } elseif ($isKaprodi) {
+                $recentQuery->where('approved_by_kaprodi', $user->id);
+            }
+        }
+
+        $recentSurat = $recentQuery->get()->map(function ($surat) {
+            return [
+                'id' => $surat->id,
+                'mahasiswa_name' => $surat->mahasiswa->user->name ?? 'Unknown',
+                'jenis_surat' => $surat->jenisSurat->nama ?? 'Unknown',
+                'status' => $surat->status,
+                'created_at' => $surat->created_at->format('d M Y H:i'),
+            ];
+        });
+
+        // 9. Approval progress
         $totalWithApproval = PengajuanSurat::whereIn('status', ['diproses', 'disetujui', 'diajukan'])->count();
 
         $completeApproval = PengajuanSurat::whereIn('status', ['diproses', 'disetujui'])
@@ -136,7 +204,6 @@ class HomeController extends Controller
             ->count();
 
         $approvalProgress = $totalWithApproval > 0 ? round(($completeApproval / $totalWithApproval) * 100, 1) : 0;
-
 
         return view('dashboard', compact(
             'totalUsers',
@@ -151,6 +218,7 @@ class HomeController extends Controller
             'approvalProgress'
         ));
     }
+
 
     // Method terpisah untuk mendapatkan data chart via AJAX (opsional)
     public function chartData(Request $request)

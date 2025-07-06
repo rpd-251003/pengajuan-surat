@@ -15,7 +15,7 @@
 
         <!-- Stats Cards Row -->
         <div class="row mb-2">
-            <div class="col-xl-3 col-md-6 mb-2">
+            <div class="col-xl-6 col-md-6 mb-2">
                 <div class="card border-start-primary h-100 py-2">
                     <div class="card-body">
                         <div class="row g-0 align-items-center">
@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6 mb-2">
+            {{-- <div class="col-xl-3 col-md-6 mb-2">
                 <div class="card border-start-success h-100 py-2">
                     <div class="card-body">
                         <div class="row g-0 align-items-center">
@@ -49,9 +49,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
-            <div class="col-xl-3 col-md-6 mb-2">
+            <div class="col-xl-6 col-md-6 mb-2">
                 <div class="card border-start-info h-100 py-2">
                     <div class="card-body">
                         <div class="row g-0 align-items-center">
@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6 mb-2">
+            {{-- <div class="col-xl-3 col-md-6 mb-2">
                 <div class="card border-start-warning h-100 py-2">
                     <div class="card-body">
                         <div class="row g-0 align-items-center">
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
         </div>
 
@@ -98,14 +98,13 @@
             <div class="col-lg-8">
                 <div class="card mb-2">
                     <div class="card-header py-3">
-                        <h6 class="m-0 fw-bold text-primary">Grafik Surat (30 Hari Terakhir)</h6>
+                        <h6 class="m-0 fw-bold text-primary">Grafik Semua Surat (30 Hari Terakhir)</h6>
                     </div>
                     <div class="card-body">
                         <canvas id="suratChart" width="400" height="300"></canvas>
                     </div>
                 </div>
             </div>
-
             <div class="col-lg-4">
                 <div class="card mb-2" style="height: 300pt; max-height: 300pt">
                     <div class="card-header py-3">
@@ -132,7 +131,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- Status Surat Row -->
@@ -213,59 +211,63 @@
             </div>
         </div>
 
-        <!-- Penanggung Jawab Row -->
-        <div class="row mb-2">
-            <div class="col-lg-6">
-                <div class="card mb-2">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 fw-bold text-primary">Pending Dosen PA</h6>
-                        <button class="btn btn-sm btn-outline-primary" onclick="showPendingDetails('dosen_pa')">
-                            <i class="fas fa-eye"></i> Detail
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        @if ($dosenPAList->count() > 0)
-                            @foreach ($dosenPAList as $dosen)
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div>
-                                        <div class="fw-bold">{{ $dosen['name'] }}</div>
-                                    </div>
-                                    <span class="badge fs-6 bg-danger">{{ $dosen['pending_count'] }} pending</span>
-                                </div>
-                            @endforeach
-                        @else
-                            <p class="text-muted mb-0">Tidak ada pending approval</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
+        @if (Auth::user()->role == 'tu')
 
-            <div class="col-lg-6">
-                <div class="card mb-2">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 fw-bold text-primary">Pending Kaprodi</h6>
-                        <button class="btn btn-sm btn-outline-primary" onclick="showPendingDetails('kaprodi')">
-                            <i class="fas fa-eye"></i> Detail
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        @if ($kaprodiList->count() > 0)
-                            @foreach ($kaprodiList as $kaprodi)
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div>
-                                        <div class="fw-bold">{{ $kaprodi['name'] }}</div>
+
+            <!-- Penanggung Jawab Row -->
+            <div class="row mb-2">
+                <div class="col-lg-6">
+                    <div class="card mb-2">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 fw-bold text-primary">Pending Dosen PA</h6>
+                            <button class="btn btn-sm btn-outline-primary" onclick="showPendingDetails('dosen_pa')">
+                                <i class="fas fa-eye"></i> Detail
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            @if ($dosenPAList->count() > 0)
+                                @foreach ($dosenPAList as $dosen)
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <div class="fw-bold">{{ $dosen['name'] }}</div>
+                                        </div>
+                                        <span class="badge fs-6 bg-danger">{{ $dosen['pending_count'] }} pending</span>
                                     </div>
-                                    <span class="badge fs-6 bg-danger">{{ $kaprodi['pending_count'] }} pending</span>
-                                </div>
-                            @endforeach
-                        @else
-                            <p class="text-muted mb-0">Tidak ada pending approval</p>
-                        @endif
+                                @endforeach
+                            @else
+                                <p class="text-muted mb-0">Tidak ada pending approval</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card mb-2">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 fw-bold text-primary">Pending Kaprodi</h6>
+                            <button class="btn btn-sm btn-outline-primary" onclick="showPendingDetails('kaprodi')">
+                                <i class="fas fa-eye"></i> Detail
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            @if ($kaprodiList->count() > 0)
+                                @foreach ($kaprodiList as $kaprodi)
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <div class="fw-bold">{{ $kaprodi['name'] }}</div>
+                                        </div>
+                                        <span class="badge fs-6 bg-danger">{{ $kaprodi['pending_count'] }} pending</span>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-muted mb-0">Tidak ada pending approval</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
+
     <!-- Modal untuk Detail Pending -->
     <div class="modal fade" id="pendingModal" tabindex="-1" aria-labelledby="pendingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -286,6 +288,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
         <div id="myToast" class="toast align-items-center text-white bg-success border-0" role="alert"

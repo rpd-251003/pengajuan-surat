@@ -18,7 +18,6 @@
                         <th>Fakultas</th>
                         <th>Prodi</th>
                         <th>Angkatan</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
             </table>
@@ -118,13 +117,7 @@
                     {
                         data: 'angkatan',
                         name: 'angkatan'
-                    },
-                    {
-                        data: 'aksi',
-                        name: 'aksi',
-                        orderable: false,
-                        searchable: false
-                    },
+                    }
                 ]
             });
 

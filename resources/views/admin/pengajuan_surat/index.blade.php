@@ -70,259 +70,497 @@
 
         <div class="card card-body">
             <h3>Daftar Pengajuan Surat</h3>
-            <p class="text-muted">Kelola semua pengajuan surat mahasiswa</p>
-
-            <!-- Filter Section -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <form method="GET" action="{{ route('admin.pengajuan.index') }}">
+            <!-- Search & Filter Section -->
+            <form method="GET" action="{{ route('admin.pengajuan.index') }}" class="mb-4 mt-3">
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="input-group">
-                            <select name="jenis_surat" class="form-select">
-                                <option value="">Semua Jenis Surat</option>
-                                {{-- @foreach($jenisSuratOptions as $option)
-                                    <option value="{{ $option->id }}"
-                                        {{ request('jenis_surat') == $option->id ? 'selected' : '' }}>
-                                        {{ $option->nama }}
-                                    </option>
-                                @endforeach --}}
-                            </select>
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="fas fa-filter me-1"></i> Filter
-                            </button>
+                            <span class="input-group-text">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-search" viewBox="0 0 16 16">
+                                    <path
+                                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                                </svg>
+                            </span>
+                            <input type="text" class="form-control" name="search" value="{{ request('search') }}"
+                                placeholder="Cari mahasiswa, jenis surat...">
                         </div>
-                    </form>
-                </div>
-                <div class="col-md-4">
-                    <form method="GET" action="{{ route('admin.pengajuan.index') }}">
-                        <div class="input-group">
-                            <select name="status" class="form-select">
-                                <option value="">Semua Status</option>
-                                <option value="diajukan" {{ request('status') == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
-                                <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                                <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                            </select>
-                            <button class="btn btn-outline-success" type="submit">
-                                <i class="fas fa-search me-1"></i> Cari
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-md-4">
-                    <a href="{{ route('admin.pengajuan.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-refresh me-1"></i> Reset Filter
-                    </a>
-                </div>
-            </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="jenis_surat">
+                            <option value="">Semua Jenis Surat</option>
+                            @foreach ($jenisSuratOptions as $jenis)
+                                <option value="{{ $jenis }}"
+                                    {{ request('jenis_surat') == $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="status">
+                            <option value="">Semua Status</option>
+                            <option value="diajukan" {{ request('status') == 'diajukan' ? 'selected' : '' }}>Diajukan
+                            </option>
+                            <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses
+                            </option>
+                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui
+                            </option>
+                            <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                    </div>
 
-            <!-- Cards for displaying pengajuan -->
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-funnel" viewBox="0 0 16 16">
+                                <path
+                                    d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z" />
+                            </svg>
+                        </button>
+                        <a href="{{ route('admin.pengajuan.index') }}" class="btn btn-outline-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                                <path
+                                    d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Cards Grid -->
             <div class="row">
-                @forelse ($pengajuanSurats as $p)
-                    <div class="col-12 mb-4">
-                        <div class="card shadow-sm border-0">
+                @forelse($pengajuanSurats as $p)
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">
+                                    <strong>{{ $p->mahasiswa->user->name ?? 'N/A' }}</strong>
+                                </h6>
+                                <small class="text-muted d-block">{{ $p->jenisSurat->nama ?? 'N/A' }}</small>
+
+                                {{-- Status Badge --}}
+                                @php
+                                    $status = $p->status ?? 'unknown';
+                                    $badgeClass = match ($status) {
+                                        'diajukan' => 'bg-warning text-dark',
+                                        'diproses' => 'bg-primary text-white',
+                                        'disetujui' => 'bg-success text-white',
+                                        'ditolak' => 'bg-danger text-white',
+                                        default => 'bg-secondary text-white',
+                                    };
+                                @endphp
+                                <span class="badge {{ $badgeClass }} fs-5">{{ ucfirst($status) }}</span>
+                            </div>
+
                             <div class="card-body">
-                                <div class="row align-items-center">
-                                    <!-- Left side - Main info -->
-                                    <div class="col-md-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-primary bg-gradient rounded-circle p-3 me-3">
-                                                <i class="fas fa-file-alt text-white fa-lg"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-1 fw-bold">{{ $p->jenisSurat->nama ?? 'N/A' }}</h6>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-user me-1"></i>
-                                                    {{ $p->mahasiswa->user->name ?? 'N/A' }}
-                                                </small><br>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-id-card me-1"></i>
-                                                    {{ $p->mahasiswa->nim ?? 'N/A' }}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Status and timeline -->
-                                    <div class="col-md-5">
-                                        @php
-                                            $statusClass = match($p->status) {
-                                                'diajukan' => 'bg-warning',
-                                                'diproses' => 'bg-primary',
-                                                'disetujui' => 'bg-success',
-                                                'ditolak' => 'bg-danger',
-                                                default => 'bg-secondary'
-                                            };
-                                        @endphp
-
-                                        <div class="mb-2">
-                                            <span class="badge {{ $statusClass }} fs-6">
-                                                {{ ucfirst($p->status) }}
+                                <!-- Keterangan -->
+                                <div class="mb-3">
+                                    <label class="fw-bold small">Keterangan:</label>
+                                    <div class="keterangan-content">
+                                        <span class="keterangan-short">
+                                            {{ Str::limit(strip_tags($p->keterangan), 100) }}
+                                        </span>
+                                        @if (strlen(strip_tags($p->keterangan)) > 100)
+                                            <span class="keterangan-full d-none">
+                                                {!! nl2br(e($p->keterangan)) !!}
                                             </span>
-                                        </div>
-
-                                        <!-- Timeline -->
-                                        <div class="d-flex align-items-center" style="font-size: 11px;">
-                                            <!-- Dosen PA -->
-                                            <div class="text-center me-2">
-                                                <div class="position-relative">
-                                                    @if ($p->approved_at_dosen_pa)
-                                                        <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                            style="width: 10px; height: 10px;">
-                                                            <i class="fas fa-check text-white" style="font-size: 6px;"></i>
-                                                        </div>
-                                                    @else
-                                                        <div class="bg-secondary rounded-circle" style="width: 10px; height: 10px;"></div>
-                                                    @endif
-                                                </div>
-                                                <small class="d-block mt-1" style="font-size: 9px;">PA</small>
-                                            </div>
-
-                                            <i class="fas fa-arrow-right text-muted me-2" style="font-size: 8px;"></i>
-
-                                            <!-- Kaprodi -->
-                                            <div class="text-center me-2">
-                                                <div class="position-relative">
-                                                    @if ($p->approved_at_kaprodi)
-                                                        <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                            style="width: 10px; height: 10px;">
-                                                            <i class="fas fa-check text-white" style="font-size: 6px;"></i>
-                                                        </div>
-                                                    @else
-                                                        <div class="bg-secondary rounded-circle" style="width: 10px; height: 10px;"></div>
-                                                    @endif
-                                                </div>
-                                                <small class="d-block mt-1" style="font-size: 9px;">Kaprodi</small>
-                                            </div>
-
-                                            <i class="fas fa-arrow-right text-muted me-2" style="font-size: 8px;"></i>
-
-                                            <!-- Wadek1 -->
-                                            <div class="text-center me-2">
-                                                <div class="position-relative">
-                                                    @if ($p->approved_at_wadek1)
-                                                        <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                            style="width: 10px; height: 10px;">
-                                                            <i class="fas fa-check text-white" style="font-size: 6px;"></i>
-                                                        </div>
-                                                    @else
-                                                        <div class="bg-secondary rounded-circle" style="width: 10px; height: 10px;"></div>
-                                                    @endif
-                                                </div>
-                                                <small class="d-block mt-1" style="font-size: 9px;">Wadek1</small>
-                                            </div>
-
-                                            <i class="fas fa-arrow-right text-muted me-2" style="font-size: 8px;"></i>
-
-                                            <!-- Staff TU -->
-                                            <div class="text-center">
-                                                <div class="position-relative">
-                                                    @if ($p->approved_at_staff_tu)
-                                                        <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                            style="width: 10px; height: 10px;">
-                                                            <i class="fas fa-check text-white" style="font-size: 6px;"></i>
-                                                        </div>
-                                                    @else
-                                                        <div class="bg-secondary rounded-circle" style="width: 10px; height: 10px;"></div>
-                                                    @endif
-                                                </div>
-                                                <small class="d-block mt-1" style="font-size: 9px;">TU</small>
-                                            </div>
-                                        </div>
+                                            <a href="javascript:void(0)"
+                                                class="text-primary small toggle-keterangan">Lihat selengkapnya</a>
+                                        @endif
                                     </div>
+                                </div>
 
-                                    <!-- Actions -->
-                                    <div class="col-md-4">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <!-- Detail Button -->
-                                            @php
-                                                $details = $p->getDetailsArray();
-                                            @endphp
-                                            @if (!empty($details) || $p->keterangan)
-                                                <button type="button" class="btn btn-sm btn-info"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#detailModal{{ $p->id }}">
-                                                    <i class="fas fa-eye me-1"></i> Detail
-                                                </button>
-                                            @endif
-
-                                            <!-- Role-based Actions -->
-                                            @if ($p->status !== 'ditolak')
-                                                @php
-                                                    $canApproveAsDosenPA = Auth::user()->canApproveAsDosenPA($p->tahun_angkatan, $p->prodi_id);
-                                                    $canApproveAsKaprodi = Auth::user()->canApproveAsKaprodi($p->tahun_angkatan, $p->prodi_id);
-                                                    $canApproveDouble = $canApproveAsDosenPA && $canApproveAsKaprodi;
-                                                @endphp
-
-                                                <!-- Dosen PA & Kaprodi Actions -->
-                                                @if ($canApproveDouble && !$p->approved_at_dosen_pa && !$p->approved_at_kaprodi)
-                                                    <button type="button" class="btn btn-sm btn-success"
-                                                        onclick="confirmApprove('{{ route('admin.pengajuan.approve_double', $p->id) }}')">
-                                                        <i class="fas fa-check-double me-1"></i> Approve PA & Kaprodi
-                                                    </button>
-                                                @else
-                                                    @if ($canApproveAsDosenPA && !$p->approved_at_dosen_pa)
-                                                        <button type="button" class="btn btn-sm btn-success"
-                                                            onclick="confirmApprove('{{ route('admin.pengajuan.approve_dosen_pa', $p->id) }}')">
-                                                            <i class="fas fa-check me-1"></i> Approve PA
-                                                        </button>
-                                                    @endif
-
-                                                    @if ($canApproveAsKaprodi && !$p->approved_at_kaprodi)
-                                                        <button type="button" class="btn btn-sm btn-primary"
-                                                            onclick="confirmApprove('{{ route('admin.pengajuan.approve_kaprodi', $p->id) }}')">
-                                                            <i class="fas fa-check me-1"></i> Approve Kaprodi
-                                                        </button>
-                                                    @endif
-                                                @endif
-
-                                                <!-- Wadek1 Actions -->
-                                                @if (Auth::user()->hasRole('wadek1') && !$p->approved_at_wadek1 && $p->approved_at_dosen_pa && $p->approved_at_kaprodi)
-                                                    <button type="button" class="btn btn-sm btn-info"
-                                                        onclick="confirmApprove('{{ route('admin.pengajuan.approve_wadek1', $p->id) }}')">
-                                                        <i class="fas fa-check me-1"></i> Approve Wadek1
-                                                    </button>
-                                                @endif
-
-                                                <!-- Staff TU Actions -->
-                                                @if (Auth::user()->hasRole('tu'))
-                                                    @if (!$p->approved_at_staff_tu && $p->approved_at_wadek1)
-                                                        <button type="button" class="btn btn-sm btn-warning"
-                                                            onclick="confirmApprove('{{ route('admin.pengajuan.approve_staff_tu', $p->id) }}')">
-                                                            <i class="fas fa-check me-1"></i> Approve TU
-                                                        </button>
-                                                    @endif
-
-                                                    @if (!$p->fileApproval && $p->approved_at_wadek1)
-                                                        <!-- Upload Surat Button -->
-                                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                                            data-bs-target="#uploadModal{{ $p->id }}">
-                                                            <i class="fas fa-upload me-1"></i> Upload Surat
-                                                        </button>
-                                                    @else
-                                                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                                            data-bs-target="#viewModal{{ $p->id }}">
-                                                            <i class="fas fa-eye me-1"></i> Lihat Surat
-                                                        </button>
-                                                    @endif
-                                                @endif
-
-                                                <!-- Reject Button for all roles that can approve -->
-                                                @if (($canApproveAsDosenPA && !$p->approved_at_dosen_pa) ||
-                                                     ($canApproveAsKaprodi && !$p->approved_at_kaprodi) ||
-                                                     (Auth::user()->hasRole('wadek1') && !$p->approved_at_wadek1 && $p->approved_at_dosen_pa && $p->approved_at_kaprodi) ||
-                                                     (Auth::user()->hasRole('tu') && !$p->approved_at_staff_tu && $p->approved_at_wadek1))
-                                                    <button type="button" class="btn btn-sm btn-danger"
-                                                        onclick="showRejectModal('{{ $p->id }}')">
-                                                        <i class="fas fa-times me-1"></i> Tolak
-                                                    </button>
-                                                @endif
-                                            @endif
+                                <!-- Info Approver -->
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted">Dosen PA:</small><br>
+                                            <small class="fw-bold">{{ $p->dosenPA->name ?? 'Belum ditentukan' }}</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Kaprodi:</small><br>
+                                            <small class="fw-bold">{{ $p->kaprodi->name ?? 'Belum ditentukan' }}</small>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Timeline Status -->
+                                <div class="timeline-status">
+                                    <div class="d-flex align-items-center mb-2">
+                                        @php
+                                            $isDosenPAApproved = $p->approved_by_dosen_pa && $p->approved_at_dosen_pa;
+                                        @endphp
+                                        <div class="timeline-icon me-2">
+                                            @if ($isDosenPAApproved)
+                                                <span class="badge bg-success rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                                        <path
+                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                                    </svg>
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <small
+                                            class="timeline-text {{ $isDosenPAApproved ? 'text-success' : 'text-muted' }}">
+                                            Dosen PA {{ $isDosenPAApproved ? 'Approved' : 'Pending' }}
+                                        </small>
+                                    </div>
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        @php
+                                            $isKaprodiApproved = $p->approved_by_kaprodi && $p->approved_at_kaprodi;
+                                        @endphp
+                                        <div class="timeline-icon me-2">
+                                            @if ($isKaprodiApproved)
+                                                <span class="badge bg-success rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                                        <path
+                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                                    </svg>
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <small
+                                            class="timeline-text {{ $isKaprodiApproved ? 'text-success' : 'text-muted' }}">
+                                            Kaprodi {{ $isKaprodiApproved ? 'Approved' : 'Pending' }}
+                                        </small>
+                                    </div>
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        @php
+                                            $isWadek1Approved = $p->approved_by_wadek1 && $p->approved_at_wadek1;
+                                        @endphp
+                                        <div class="timeline-icon me-2">
+                                            @if ($isWadek1Approved)
+                                                <span class="badge bg-success rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                                        <path
+                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                                    </svg>
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <small
+                                            class="timeline-text {{ $isWadek1Approved ? 'text-success' : 'text-muted' }}">
+                                            Wadek 1 {{ $isWadek1Approved ? 'Approved' : 'Pending' }}
+                                        </small>
+                                    </div>
+
+                                    <div class="d-flex align-items-center">
+                                        @php
+                                            $isStaffTUApproved = $p->approved_by_staff_tu && $p->approved_at_staff_tu;
+                                        @endphp
+                                        <div class="timeline-icon me-2">
+                                            @if ($isStaffTUApproved)
+                                                <span class="badge bg-success rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary rounded-circle p-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                                        <path
+                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                                    </svg>
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <small
+                                            class="timeline-text {{ $isStaffTUApproved ? 'text-success' : 'text-muted' }}">
+                                            Staff TU {{ $isStaffTUApproved ? 'Approved' : 'Pending' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                @php $role = Auth::user()->role; @endphp
+                                <div class="mb-3">
+                                    @php
+                                        $details = $p->getDetailsArray();
+                                    @endphp
+                                    @if (!empty($details) || $p->keterangan)
+                                        <button type="button" class="btn btn-outline-info btn-sm w-100"
+                                            data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
+                                            <i class="bi bi-eye me-1"></i> Lihat Detail Lengkap
+                                        </button>
+                                    @else
+                                        <div class="text-center">
+                                            <small class="text-muted">Tidak ada detail tambahan</small>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                @if ($role == 'wadek1')
+                                    @if (is_null($p->approved_by_wadek1))
+                                        <form method="POST"
+                                            action="{{ route('admin.pengajuan.approve_wadek1', $p->id) }}"
+                                            class="d-inline">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="btn btn-sm btn-success me-1"
+                                                onclick="return confirm('Yakin approve?')">
+                                                <i class="fas fa-check me-1"></i> Approve
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <button type="button" class="btn btn-sm btn-danger btn-reject"
+                                        data-bs-toggle="modal" data-bs-target="#rejectModal"
+                                        data-id="{{ $p->id }}" data-level="wadek1">
+                                        <i class="fas fa-times me-1"></i> Reject
+                                    </button>
+                                @elseif($role == 'tu')
+                                    {{-- Tombol Approve --}}
+                                    <form method="POST" action="{{ route('admin.pengajuan.approve_staff_tu', $p->id) }}"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-sm btn-success me-1"
+                                            onclick="return confirm('Yakin approve?')">
+                                            <i class="fas fa-check me-1"></i> Approve
+                                        </button>
+                                    </form>
+
+                                    {{-- Tombol Reject --}}
+                                    <button type="button" class="btn btn-sm btn-danger btn-reject"
+                                        data-bs-toggle="modal" data-bs-target="#rejectModal"
+                                        data-id="{{ $p->id }}" data-level="staff_tu">
+                                        <i class="fas fa-times me-1"></i> Reject
+                                    </button>
+
+                                    {{-- Tombol Upload Surat --}}
+                                    @if (!$p->fileApproval)
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#uploadModal{{ $p->id }}">
+                                            <i class="fas fa-upload me-1"></i> Upload Surat
+                                        </button>
+
+
+                                        <div class="modal fade" id="uploadModal{{ $p->id }}" tabindex="-1"
+                                            aria-labelledby="uploadModalLabel{{ $p->id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <form method="POST" action="{{ route('file-approvals.store') }}"
+                                                    enctype="multipart/form-data">
+                                                    @csrf
+                                                    <input type="hidden" name="id_pengajuan"
+                                                        value="{{ $p->id }}">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="uploadModalLabel{{ $p->id }}">
+                                                                Upload Surat
+                                                                untuk <br> {{ $p->mahasiswa->user->name ?? 'N/A' }}<small
+                                                                    class="text-muted d-block">{{ $p->jenisSurat->nama ?? 'N/A' }}</small>
+                                                            </h5>
+
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label for="nomor_surat" class="form-label">
+                                                                    <i class="fas fa-file-alt me-1 text-primary"></i> Nomor
+                                                                    Surat
+                                                                </label>
+                                                                <input type="text" class="form-control"
+                                                                    name="nomor_surat" id="nomor_surat" required>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="file_surat" class="form-label">
+                                                                    <i class="fas fa-upload me-1 text-success"></i> Upload
+                                                                    Surat
+                                                                </label>
+                                                                <input type="file" class="form-control"
+                                                                    name="file_surat" id="file_surat"
+                                                                    accept=".pdf,.doc,.docx" required>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">
+                                                                <i class="fas fa-times me-1"></i> Batal
+                                                            </button>
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-paper-plane me-1"></i> Upload Surat
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
+                                            data-bs-target="#viewModal{{ $p->id }}">
+                                            <i class="fas fa-eye me-1"></i> Lihat Surat
+                                        </button>
+
+                                        <div class="modal fade" id="viewModal{{ $p->id }}" tabindex="-1"
+                                            aria-labelledby="viewModalLabel{{ $p->id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="viewModalLabel{{ $p->id }}">
+                                                            Surat
+                                                            - Pengajuan
+                                                            #{{ $p->id }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Tutup"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{-- Tabs --}}
+                                                        <ul class="nav nav-tabs mb-3" id="tabSurat{{ $p->id }}"
+                                                            role="tablist">
+                                                            <li class="nav-item" role="presentation">
+                                                                <button class="nav-link active"
+                                                                    id="detail-tab{{ $p->id }}"
+                                                                    data-bs-toggle="tab"
+                                                                    data-bs-target="#detail{{ $p->id }}"
+                                                                    type="button" role="tab">
+                                                                    Detail
+                                                                </button>
+                                                            </li>
+                                                            <li class="nav-item" role="presentation">
+                                                                <button class="nav-link" id="edit-tab{{ $p->id }}"
+                                                                    data-bs-toggle="tab"
+                                                                    data-bs-target="#edit{{ $p->id }}"
+                                                                    type="button" role="tab">
+                                                                    Edit
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+
+                                                        <div class="tab-content" id="tabContentSurat{{ $p->id }}">
+                                                            {{-- Detail Tab --}}
+                                                            <div class="tab-pane fade show active"
+                                                                id="detail{{ $p->id }}" role="tabpanel">
+                                                                <div class="card border-0 shadow-sm">
+                                                                    <div class="card-body">
+                                                                        <h6 class="text-primary mb-3"><i
+                                                                                class="fas fa-file-alt me-1"></i> Detail
+                                                                            Surat</h6>
+
+                                                                        <div class="mb-2">
+                                                                            <i class="fas fa-hashtag text-muted me-2"></i>
+                                                                            <strong>Nomor Surat:</strong>
+                                                                            <span
+                                                                                class="text-dark">{{ $p->fileApproval->nomor_surat }}</span>
+                                                                        </div>
+
+                                                                        <div class="mb-2">
+                                                                            <i class="fas fa-file-pdf text-muted me-2"></i>
+                                                                            <strong>Nama File:</strong>
+                                                                            <span
+                                                                                class="text-dark">{{ basename($p->fileApproval->file_surat) }}</span>
+                                                                        </div>
+
+                                                                        <div class="mt-4 text-end">
+                                                                            <a href="{{ asset('storage/' . $p->fileApproval->file_surat) }}"
+                                                                                target="_blank"
+                                                                                class="btn btn-sm btn-success">
+                                                                                <i class="fas fa-download me-1"></i>
+                                                                                Download File
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            {{-- Edit Tab --}}
+                                                            <div class="tab-pane fade" id="edit{{ $p->id }}"
+                                                                role="tabpanel">
+                                                                <form
+                                                                    action="{{ route('file-approvals.update', $p->fileApproval->id) }}"
+                                                                    method="POST" enctype="multipart/form-data">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <input type="hidden" name="id_pengajuan"
+                                                                        value="{{ $p->id }}">
+
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Nomor Surat</label>
+                                                                        <input type="text" name="nomor_surat"
+                                                                            value="{{ $p->fileApproval->nomor_surat }}"
+                                                                            class="form-control" required>
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Ganti File Surat
+                                                                            (opsional)
+                                                                        </label>
+                                                                        <input type="file" name="file_surat"
+                                                                            class="form-control" accept=".pdf,.doc,.docx">
+                                                                    </div>
+                                                                    <div class="text-end">
+                                                                        <button type="submit" class="btn btn-primary">
+                                                                            <i class="fas fa-save me-1"></i> Simpan
+                                                                            Perubahan
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div> {{-- end modal-body --}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal Upload Surat -->
+                                    @endif
+
+
+
+                                    {{-- Modal Upload Surat --}}
+                                @else
+                                    <span class="text-muted small">Tidak ada aksi</span>
+                                @endif
+
                             </div>
                         </div>
                     </div>
+
+
                 @empty
                     <div class="col-12">
                         <div class="alert alert-info text-center">
@@ -341,348 +579,6 @@
             <!-- Pagination -->
             <div class="d-flex justify-content-center mt-4">
                 {{ $pengajuanSurats->appends(request()->query())->links() }}
-            </div>
-        </div>
-    </div>
-
-    <!-- Detail Modals -->
-    @foreach ($pengajuanSurats as $pengajuan)
-        <div class="modal fade" id="detailModal{{ $pengajuan->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-file-alt me-2"></i>
-                            Detail Pengajuan: {{ $pengajuan->jenisSurat->nama ?? 'Belum ditentukan' }}<br>
-                            <small class="text-muted">
-                                Pengajuan #{{ $pengajuan->id }} - {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
-                            </small>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Info Pengajuan -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body p-3">
-                                        <h6 class="mb-2"><i class="fas fa-info-circle me-1"></i> Informasi Umum</h6>
-                                        <div class="mb-2">
-                                            <strong>Status:</strong>
-                                            @php
-                                                $statusClass = match($pengajuan->status) {
-                                                    'diajukan' => 'bg-warning',
-                                                    'diproses' => 'bg-primary',
-                                                    'disetujui' => 'bg-success',
-                                                    'ditolak' => 'bg-danger',
-                                                    default => 'bg-secondary'
-                                                };
-                                            @endphp
-                                            <span class="badge {{ $statusClass }}">{{ ucfirst($pengajuan->status) }}</span>
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>Tanggal Pengajuan:</strong> {{ $pengajuan->created_at->format('d/m/Y H:i') }}
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>Mahasiswa:</strong> {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>NIM:</strong> {{ $pengajuan->mahasiswa->nim ?? 'N/A' }}
-                                        </div>
-                                        @if ($pengajuan->keterangan)
-                                            <div class="mb-2">
-                                                <strong>Keterangan:</strong><br>
-                                                <div class="bg-white p-2 rounded border">
-                                                    {!! nl2br(e($pengajuan->keterangan)) !!}
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body p-3">
-                                        <h6 class="mb-2"><i class="fas fa-clock me-1"></i> Status Approval</h6>
-                                        <div class="mb-2">
-                                            <strong>Dosen PA:</strong>
-                                            @if ($pengajuan->approved_at_dosen_pa)
-                                                <span class="badge bg-success">✓ Disetujui</span><br>
-                                                <small class="text-muted">
-                                                    {{ $pengajuan->dosenPA->name ?? 'N/A' }} -
-                                                    {{ \Carbon\Carbon::parse($pengajuan->approved_at_dosen_pa)->format('d/m/Y H:i') }}
-                                                </small>
-                                            @else
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @endif
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>Kaprodi:</strong>
-                                            @if ($pengajuan->approved_at_kaprodi)
-                                                <span class="badge bg-success">✓ Disetujui</span><br>
-                                                <small class="text-muted">
-                                                    {{ $pengajuan->kaprodi->name ?? 'N/A' }} -
-                                                    {{ \Carbon\Carbon::parse($pengajuan->approved_at_kaprodi)->format('d/m/Y H:i') }}
-                                                </small>
-                                            @else
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @endif
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>Wadek1:</strong>
-                                            @if ($pengajuan->approved_at_wadek1)
-                                                <span class="badge bg-success">✓ Disetujui</span><br>
-                                                <small class="text-muted">
-                                                    {{ $pengajuan->wadek1->name ?? 'N/A' }} -
-                                                    {{ \Carbon\Carbon::parse($pengajuan->approved_at_wadek1)->format('d/m/Y H:i') }}
-                                                </small>
-                                            @else
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @endif
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>Staff TU:</strong>
-                                            @if ($pengajuan->approved_at_staff_tu)
-                                                <span class="badge bg-success">✓ Selesai</span><br>
-                                                <small class="text-muted">
-                                                    {{ $pengajuan->staffTU->name ?? 'N/A' }} -
-                                                    {{ \Carbon\Carbon::parse($pengajuan->approved_at_staff_tu)->format('d/m/Y H:i') }}
-                                                </small>
-                                            @else
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Detail Fields -->
-                        @if ($pengajuan->jenisSurat && $pengajuan->jenisSurat->fields)
-                            @php
-                                $details = $pengajuan->getDetailsArray();
-                            @endphp
-                            @if (!empty($details))
-                                <h6 class="mb-3"><i class="fas fa-list me-2"></i> Detail Pengajuan</h6>
-                                <div class="row">
-                                    @foreach ($pengajuan->jenisSurat->fields as $field)
-                                        @php
-                                            $value = $details[$field->field_name] ?? '';
-                                        @endphp
-                                        @if ($value)
-                                            <div class="col-md-6 mb-3">
-                                                <div class="card border-0 bg-light">
-                                                    <div class="card-body p-3">
-                                                        <strong>{{ $field->field_label }}:</strong>
-                                                        <div class="mt-1">
-                                                            @if ($field->field_type === 'file')
-                                                                @php
-                                                                    $fileInfo = is_array($value) ? $value : json_decode($value, true);
-                                                                @endphp
-                                                                @if ($fileInfo && isset($fileInfo['path']))
-                                                                    <div class="d-flex align-items-center">
-                                                                        @php
-                                                                            $extension = pathinfo($fileInfo['original_name'] ?? '', PATHINFO_EXTENSION);
-                                                                            $iconClass = match(strtolower($extension)) {
-                                                                                'pdf' => 'fas fa-file-pdf text-danger',
-                                                                                'doc', 'docx' => 'fas fa-file-word text-primary',
-                                                                                'xls', 'xlsx' => 'fas fa-file-excel text-success',
-                                                                                'jpg', 'jpeg', 'png', 'gif' => 'fas fa-file-image text-info',
-                                                                                'zip', 'rar' => 'fas fa-file-archive text-warning',
-                                                                                default => 'fas fa-file text-secondary'
-                                                                            };
-                                                                        @endphp
-                                                                        <i class="{{ $iconClass }} fa-2x me-3"></i>
-                                                                        <div>
-                                                                            <a href="{{ route('pengajuan_surat.download_file', [$pengajuan->id, $field->field_name]) }}"
-                                                                               class="text-decoration-none fw-bold">
-                                                                                {{ $fileInfo['original_name'] ?? 'File' }}
-                                                                            </a>
-                                                                            @if (isset($fileInfo['size']))
-                                                                                <small class="text-muted d-block">
-                                                                                    <i class="fas fa-hdd me-1"></i>
-                                                                                    {{ number_format($fileInfo['size'] / 1024, 2) }} KB
-                                                                                </small>
-                                                                            @endif
-                                                                            <small class="text-muted d-block">
-                                                                                <i class="fas fa-download me-1"></i>
-                                                                                Klik untuk download
-                                                                            </small>
-                                                                        </div>
-                                                                    </div>
-                                                                @else
-                                                                    <span class="text-muted">
-                                                                        <i class="fas fa-exclamation-triangle me-1"></i>
-                                                                        File tidak tersedia
-                                                                    </span>
-                                                                @endif
-                                                            @elseif ($field->field_type === 'textarea')
-                                                                <div class="bg-white p-2 rounded border">
-                                                                    {!! nl2br(e($value)) !!}
-                                                                </div>
-                                                            @elseif ($field->field_type === 'select')
-                                                                <span class="badge bg-info">{{ $value }}</span>
-                                                            @elseif ($field->field_type === 'checkbox')
-                                                                @if (is_array($value))
-                                                                    @foreach ($value as $item)
-                                                                        <span class="badge bg-secondary me-1">{{ $item }}</span>
-                                                                    @endforeach
-                                                                @else
-                                                                    <span class="badge bg-secondary">{{ $value }}</span>
-                                                                @endif
-                                                            @else
-                                                                <div class="text-dark">{{ $value }}</div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            @endif
-                        @endif
-
-                        <!-- File Surat yang sudah diupload -->
-                        @if ($pengajuan->fileApproval)
-                            <div class="mt-4">
-                                <h6 class="mb-3"><i class="fas fa-file-pdf me-2"></i> File Surat</h6>
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
-                                            <div>
-                                                <strong>{{ $pengajuan->fileApproval->nomor_surat }}</strong><br>
-                                                <small class="text-muted">
-                                                    Diupload: {{ $pengajuan->fileApproval->created_at->format('d/m/Y H:i') }}
-                                                </small>
-                                            </div>
-                                            <div class="ms-auto">
-                                                <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}"
-                                                   target="_blank" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-download me-1"></i> Download
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Tutup
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-
-    <!-- Upload Modal for Staff TU -->
-    @foreach ($pengajuanSurats as $p)
-        @if (Auth::user()->hasRole('tu'))
-            <!-- Modal Upload Surat -->
-            <div class="modal fade" id="uploadModal{{ $p->id }}" tabindex="-1"
-                aria-labelledby="uploadModalLabel{{ $p->id }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <form method="POST" action="{{ route('admin.pengajuan.upload_surat', $p->id) }}"
-                        enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="uploadModalLabel{{ $p->id }}">
-                                    Upload Surat - {{ $p->mahasiswa->user->name ?? 'N/A' }}
-                                    <small class="text-muted d-block">{{ $p->jenisSurat->nama ?? 'N/A' }}</small>
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="nomor_surat" class="form-label">
-                                        <i class="fas fa-file-alt me-1 text-primary"></i> Nomor Surat
-                                    </label>
-                                    <input type="text" class="form-control" name="nomor_surat" id="nomor_surat" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="file_surat" class="form-label">
-                                        <i class="fas fa-upload me-1 text-success"></i> Upload Surat
-                                    </label>
-                                    <input type="file" class="form-control" name="file_surat" id="file_surat" accept=".pdf,.doc,.docx" required>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-1"></i> Batal
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-1"></i> Upload Surat
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal View Surat -->
-            <div class="modal fade" id="viewModal{{ $p->id }}" tabindex="-1"
-                aria-labelledby="viewModalLabel{{ $p->id }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="viewModalLabel{{ $p->id }}">
-                                Surat - Pengajuan #{{ $p->id }}
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            @if ($p->fileApproval)
-                                <div class="text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-file-pdf fa-4x text-danger"></i>
-                                    </div>
-                                    <h6>{{ $p->fileApproval->nomor_surat }}</h6>
-                                    <p class="text-muted">{{ $p->jenisSurat->nama ?? 'N/A' }}</p>
-                                    <a href="{{ asset('storage/' . $p->fileApproval->file_surat) }}"
-                                       target="_blank" class="btn btn-primary">
-                                        <i class="fas fa-download me-2"></i>Download Surat
-                                    </a>
-                                </div>
-                            @else
-                                <div class="text-center">
-                                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                                    <h6>File surat belum tersedia</h6>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-    @endforeach
-
-    <!-- Approval confirmation modal -->
-    <div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Konfirmasi Persetujuan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menyetujui pengajuan surat ini?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form id="approveForm" method="POST" style="display: inline;">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-success">Ya, Setujui</button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
@@ -712,47 +608,505 @@
             </form>
         </div>
     </div>
-                        <button type="submit" class="btn btn-danger">Tolak</button>
+
+    @foreach ($pengajuanSurats as $pengajuan)
+        <div class="modal fade" id="detailModal{{ $pengajuan->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Detail Pengajuan: {{ $pengajuan->jenisSurat->nama ?? 'Belum ditentukan' }}<br>
+                            <small class="text-muted">
+                                Pengajuan #{{ $pengajuan->id }} - {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
+                            </small>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Info Pengajuan -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="mb-2"><i class="fas fa-info-circle me-1"></i> Informasi Umum</h6>
+                                        <div class="mb-2">
+                                            <strong>Status:</strong>
+                                            @php
+                                                $statusCount = 0;
+                                                if ($pengajuan->approved_at_dosen_pa) {
+                                                    $statusCount++;
+                                                }
+                                                if ($pengajuan->approved_at_kaprodi) {
+                                                    $statusCount++;
+                                                }
+                                                if ($pengajuan->approved_at_wadek1) {
+                                                    $statusCount++;
+                                                }
+                                                if ($pengajuan->approved_at_staff_tu) {
+                                                    $statusCount++;
+                                                }
+
+                                                $overallStatus =
+                                                    $statusCount == 0
+                                                        ? 'pending'
+                                                        : ($statusCount == 4
+                                                            ? 'approved'
+                                                            : 'partial');
+                                                $statusClass = match ($overallStatus) {
+                                                    'pending' => 'bg-warning',
+                                                    'partial' => 'bg-primary',
+                                                    'approved' => 'bg-success',
+                                                    default => 'bg-secondary',
+                                                };
+                                                $statusText = match ($overallStatus) {
+                                                    'pending' => 'Pending',
+                                                    'partial' => 'Diproses',
+                                                    'approved' => 'Disetujui',
+                                                    default => 'Unknown',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Progress:</strong> {{ $statusCount }}/4 Tahap
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Tanggal Pengajuan:</strong>
+                                            {{ $pengajuan->created_at->format('d/m/Y H:i') }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Mahasiswa:</strong> {{ $pengajuan->mahasiswa->user->name ?? 'N/A' }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>NIM:</strong> {{ $pengajuan->mahasiswa->nim ?? 'N/A' }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Prodi:</strong> {{ $pengajuan->mahasiswa->prodi->nama ?? 'N/A' }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Angkatan:</strong> {{ $pengajuan->mahasiswa->angkatan ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="mb-2"><i class="fas fa-tasks me-1"></i> Status Persetujuan</h6>
+
+                                        <!-- Dosen PA -->
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                            style="background-color: {{ $pengajuan->approved_at_dosen_pa ? '#d4edda' : '#f8d7da' }}">
+                                            <div>
+                                                <strong>Dosen PA:</strong><br>
+                                                <small
+                                                    class="text-muted">{{ $pengajuan->dosenPa->name ?? 'Belum ditentukan' }}</small>
+                                            </div>
+                                            <div>
+                                                @if ($pengajuan->approved_at_dosen_pa)
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>Approved
+                                                    </span>
+                                                    <br><small>{{ $pengajuan->approved_at_dosen_pa }}</small>
+                                                @else
+                                                    <span class="badge bg-warning">Pending</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Kaprodi -->
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                            style="background-color: {{ $pengajuan->approved_at_kaprodi ? '#d4edda' : '#f8d7da' }}">
+                                            <div>
+                                                <strong>Kaprodi:</strong><br>
+                                                <small
+                                                    class="text-muted">{{ $pengajuan->kaprodi->name ?? 'Belum ditentukan' }}</small>
+                                            </div>
+                                            <div>
+                                                @if ($pengajuan->approved_at_kaprodi)
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>Approved
+                                                    </span>
+                                                    <br><small>{{ $pengajuan->approved_at_kaprodi }}</small>
+                                                @else
+                                                    <span class="badge bg-warning">Pending</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Wadek 1 -->
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                            style="background-color: {{ $pengajuan->approved_at_wadek1 ? '#d4edda' : '#f8d7da' }}">
+                                            <div>
+                                                <strong>Wadek 1:</strong><br>
+                                                <small
+                                                    class="text-muted">{{ $pengajuan->wadek1->name ?? 'Belum ditentukan' }}</small>
+                                            </div>
+                                            <div>
+                                                @if ($pengajuan->approved_at_wadek1)
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>Approved
+                                                    </span>
+                                                    <br><small>{{ $pengajuan->approved_at_wadek1 }}</small>
+                                                @else
+                                                    <span class="badge bg-warning">Pending</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Staff TU -->
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                            style="background-color: {{ $pengajuan->approved_at_staff_tu ? '#d4edda' : '#f8d7da' }}">
+                                            <div>
+                                                <strong>Staff TU:</strong><br>
+                                                <small
+                                                    class="text-muted">{{ $pengajuan->staffTu->name ?? 'Belum ditentukan' }}</small>
+                                            </div>
+                                            <div>
+                                                @if ($pengajuan->approved_at_staff_tu)
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>Approved
+                                                    </span>
+                                                    <br><small>{{ $pengajuan->approved_at_staff_tu }}</small>
+                                                @else
+                                                    <span class="badge bg-warning">Pending</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Approval Section - Highlighted -->
+                        @if ($pengajuan->fileApproval && $pengajuan->fileApproval->file_surat)
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-success bg-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-3 text-success"><i class="fas fa-file-download me-1"></i> File
+                                                Surat Tersedia</h6>
+                                            <div
+                                                class="d-flex align-items-center p-3 bg-white rounded border border-success">
+                                                <div class="me-3">
+                                                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-semibold h6 mb-1">
+                                                        {{ $pengajuan->jenisSurat->nama ?? 'Surat Resmi' }}</div>
+                                                    <small class="text-muted">File surat yang telah disetujui dan siap
+                                                        diunduh</small>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-calendar me-1"></i>
+                                                        Dibuat:
+                                                        @if ($pengajuan->fileApproval->created_at)
+                                                            @if (is_string($pengajuan->fileApproval->created_at))
+                                                                {{ $pengajuan->fileApproval->created_at }}
+                                                            @else
+                                                                {{ $pengajuan->fileApproval->created_at }}
+                                                            @endif
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}"
+                                                        target="_blank" class="btn btn-success btn-lg me-2">
+                                                        <i class="fas fa-eye me-1"></i>
+                                                        Lihat
+                                                    </a>
+                                                    <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}"
+                                                        download class="btn btn-primary btn-lg">
+                                                        <i class="fas fa-download me-1"></i>
+                                                        Download
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-warning bg-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-2 text-warning"><i class="fas fa-exclamation-triangle me-1"></i>
+                                                File Surat</h6>
+                                            <div class="alert alert-warning mb-0">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                File surat belum tersedia. Surat akan tersedia setelah semua tahap
+                                                persetujuan selesai.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Keterangan -->
+                        @if ($pengajuan->keterangan)
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-2"><i class="fas fa-comment me-1"></i> Keterangan</h6>
+                                            <div class="bg-white p-3 rounded border">
+                                                {!! nl2br(e($pengajuan->keterangan)) !!}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Detail Pengajuan -->
+                        @if ($pengajuan->jenisSurat && $pengajuan->jenisSurat->fields)
+                            @php
+                                $details = $pengajuan->getDetailsArray();
+                            @endphp
+                            @if (!empty($details))
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <div class="card border-0 bg-light">
+                                            <div class="card-body p-3">
+                                                <h6 class="mb-3"><i class="fas fa-list me-2"></i> Detail Pengajuan</h6>
+                                                @foreach ($pengajuan->jenisSurat->fields as $field)
+                                                    @php
+                                                        $value = $details[$field->field_name] ?? '';
+                                                    @endphp
+                                                    @if ($value)
+                                                        <div class="mb-3 p-3 bg-white rounded border">
+                                                            <strong
+                                                                class="d-block mb-2">{{ $field->field_label }}:</strong>
+                                                            <div class="mt-1">
+                                                                @if ($field->field_type === 'file')
+                                                                    @php
+                                                                        $fileInfo = is_array($value)
+                                                                            ? $value
+                                                                            : json_decode($value, true);
+                                                                    @endphp
+                                                                    @if ($fileInfo && isset($fileInfo['original_name']))
+                                                                        <div
+                                                                            class="d-flex align-items-center p-3 border rounded bg-light">
+                                                                            <div class="me-3">
+                                                                                @php
+                                                                                    $ext = strtolower(
+                                                                                        pathinfo(
+                                                                                            $fileInfo['original_name'],
+                                                                                            PATHINFO_EXTENSION,
+                                                                                        ),
+                                                                                    );
+                                                                                    $icon = match ($ext) {
+                                                                                        'pdf'
+                                                                                            => 'fas fa-file-pdf text-danger',
+                                                                                        'doc',
+                                                                                        'docx'
+                                                                                            => 'fas fa-file-word text-primary',
+                                                                                        'jpg',
+                                                                                        'jpeg',
+                                                                                        'png'
+                                                                                            => 'fas fa-file-image text-info',
+                                                                                        default
+                                                                                            => 'fas fa-file text-secondary',
+                                                                                    };
+                                                                                @endphp
+                                                                                <i class="{{ $icon }}"
+                                                                                    style="font-size: 2rem;"></i>
+                                                                            </div>
+                                                                            <div class="flex-grow-1">
+                                                                                <div class="fw-bold text-dark">
+                                                                                    {{ $fileInfo['original_name'] }}</div>
+                                                                                <small class="text-muted">
+                                                                                    <i
+                                                                                        class="fas fa-weight me-1"></i>{{ number_format($fileInfo['size'] / 1024, 2) }}
+                                                                                    KB
+                                                                                    <span class="mx-2">•</span>
+                                                                                    <i class="fas fa-calendar me-1"></i>
+                                                                                    @try
+                                                                                        {{ $fileInfo['uploaded_at'] }}
+                                                                                        @catch(\Exception $e)
+                                                                                        {{ $fileInfo['uploaded_at'] ?? 'N/A' }}
+                                                                                    @endtry
+                                                                                </small>
+                                                                            </div>
+                                                                            <div class="text-end">
+                                                                                <a href="{{ route('pengajuan.file.view', [$pengajuan->id, $field->field_name]) }}"
+                                                                                    target="_blank"
+                                                                                    class="btn btn-sm btn-outline-primary me-2"
+                                                                                    title="Buka file">
+                                                                                    <i class="fas fa-eye me-1"></i> Lihat
+                                                                                </a>
+                                                                                <a href="{{ route('pengajuan.file.download', [$pengajuan->id, $field->field_name]) }}"
+                                                                                    class="btn btn-sm btn-outline-success"
+                                                                                    title="Download">
+                                                                                    <i class="fas fa-download me-1"></i>
+                                                                                    Download
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    @else
+                                                                        <span class="text-muted">File tidak tersedia</span>
+                                                                    @endif
+                                                                @elseif ($field->field_type === 'checkbox')
+                                                                    @php
+                                                                        $selectedValues = is_string($value)
+                                                                            ? json_decode($value, true)
+                                                                            : $value;
+                                                                        $selectedValues = is_array($selectedValues)
+                                                                            ? $selectedValues
+                                                                            : [$value];
+                                                                    @endphp
+                                                                    @if ($field->field_options)
+                                                                        <div class="d-flex flex-wrap gap-2">
+                                                                            @foreach ($selectedValues as $selectedValue)
+                                                                                @if (isset($field->field_options[$selectedValue]))
+                                                                                    <span
+                                                                                        class="badge bg-success fs-6 px-3 py-2">
+                                                                                        <i
+                                                                                            class="fas fa-check-circle me-1"></i>
+                                                                                        {{ $field->field_options[$selectedValue] }}
+                                                                                    </span>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </div>
+                                                                    @endif
+                                                                @elseif (in_array($field->field_type, ['select', 'radio']) && $field->field_options)
+                                                                    <span class="badge bg-info fs-6 px-3 py-2">
+                                                                        <i class="fas fa-tag me-1"></i>
+                                                                        {{ $field->field_options[$value] ?? $value }}
+                                                                    </span>
+                                                                @elseif ($field->field_type === 'textarea')
+                                                                    <div class="bg-white p-3 rounded border"
+                                                                        style="min-height: 80px;">
+                                                                        <div class="text-dark">{!! nl2br(e($value)) !!}
+                                                                        </div>
+                                                                    </div>
+                                                                @elseif ($field->field_type === 'date')
+                                                                    <div class="d-flex align-items-center">
+                                                                        <i
+                                                                            class="fas fa-calendar-alt text-primary me-2"></i>
+                                                                        <span class="text-dark fw-semibold">
+                                                                            @try
+                                                                                {{ \Carbon\Carbon::parse($value)->format('d F Y') }}
+                                                                                @catch(\Exception $e)
+                                                                                {{ $value }}
+                                                                            @endtry
+                                                                        </span>
+                                                                    </div>
+                                                                @elseif ($field->field_type === 'email')
+                                                                    <div class="d-flex align-items-center">
+                                                                        <i class="fas fa-envelope text-info me-2"></i>
+                                                                        <a href="mailto:{{ $value }}"
+                                                                            class="text-primary text-decoration-none">{{ $value }}</a>
+                                                                    </div>
+                                                                @elseif ($field->field_type === 'url')
+                                                                    <div class="d-flex align-items-center">
+                                                                        <i class="fas fa-link text-success me-2"></i>
+                                                                        <a href="{{ $value }}" target="_blank"
+                                                                            class="text-primary text-decoration-none">{{ $value }}</a>
+                                                                    </div>
+                                                                @elseif ($field->field_type === 'number')
+                                                                    <div class="d-flex align-items-center">
+                                                                        <i class="fas fa-hashtag text-secondary me-2"></i>
+                                                                        <span
+                                                                            class="text-dark fw-semibold">{{ number_format($value) }}</span>
+                                                                    </div>
+                                                                @else
+                                                                    <div class="text-dark">{{ $value }}</div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+
+                    <!-- Modal Footer with Download Button -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Tutup
+                        </button>
+
+                        @if ($pengajuan->fileApproval && $pengajuan->fileApproval->file_surat)
+                            <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}" target="_blank"
+                                class="btn btn-info">
+                                <i class="fas fa-eye me-1"></i>
+                                Lihat Surat
+                            </a>
+                            <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}" download
+                                class="btn btn-success">
+                                <i class="fas fa-download me-1"></i>
+                                Download Surat
+                            </a>
+                        @else
+                            <button type="button" class="btn btn-warning" disabled>
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                File Belum Tersedia
+                            </button>
+                        @endif
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
+    @endforeach
+
 @endsection
 
 @push('scripts')
     <script>
-        function confirmApprove(url) {
-            document.getElementById('approveForm').action = url;
-            new bootstrap.Modal(document.getElementById('approveModal')).show();
-        }
-
-        function showRejectModal(pengajuanId) {
-            // Determine reject route based on user role and current approval status
-            let rejectUrl = '';
-
-            @if(Auth::user()->hasRole('tu'))
-                rejectUrl = '{{ url("/data/pengajuan") }}/' + pengajuanId + '/reject_staff_tu';
-            @elseif(Auth::user()->hasRole('wadek1'))
-                rejectUrl = '{{ url("/data/pengajuan") }}/' + pengajuanId + '/reject_wadek1';
-            @elseif(Auth::user()->hasRole('kaprodi'))
-                rejectUrl = '{{ url("/data/pengajuan") }}/' + pengajuanId + '/reject_kaprodi';
-            @else
-                // For dosen or dual role
-                rejectUrl = '{{ url("/data/pengajuan") }}/' + pengajuanId + '/reject_dosen_pa';
-            @endif
-
-            document.getElementById('rejectForm').action = rejectUrl;
-            new bootstrap.Modal(document.getElementById('rejectModal')).show();
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             // Auto hide alerts after 5 seconds
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {
                 setTimeout(function() {
-                    alert.style.display = 'none';
-                }, 5000);
+                    const bsAlert = new bootstrap.Alert(alert);
+                    if (bsAlert) {
+                        bsAlert.close();
+                    }
+                }, 5000); // 5 seconds
+            });
+
+            // Toggle keterangan
+            document.querySelectorAll('.toggle-keterangan').forEach(button => {
+                button.addEventListener('click', function() {
+                    const parent = this.closest('.keterangan-content');
+                    const shortText = parent.querySelector('.keterangan-short');
+                    const fullText = parent.querySelector('.keterangan-full');
+
+                    if (shortText.classList.contains('d-none')) {
+                        // Show short, hide full
+                        shortText.classList.remove('d-none');
+                        fullText.classList.add('d-none');
+                        this.textContent = 'Lihat selengkapnya';
+                    } else {
+                        // Show full, hide short
+                        shortText.classList.add('d-none');
+                        fullText.classList.remove('d-none');
+                        this.textContent = 'Lihat lebih sedikit';
+                    }
+                });
+            });
+
+            // Modal reject
+            let rejectModal = document.getElementById('rejectModal');
+            rejectModal.addEventListener('show.bs.modal', function(event) {
+                let button = event.relatedTarget;
+                let pengajuanId = button.getAttribute('data-id');
+                let level = button.getAttribute('data-level');
+                let form = document.getElementById('rejectForm');
+
+                // Update action URL sesuai level dan id
+                form.action = `/admin/pengajuan/${pengajuanId}/reject_${level}`;
             });
         });
     </script>

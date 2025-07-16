@@ -320,10 +320,23 @@
                                         $details = $p->getDetailsArray();
                                     @endphp
                                     @if (!empty($details) || $p->keterangan)
-                                        <button type="button" class="btn btn-outline-info btn-sm w-100"
-                                            data-bs-toggle="modal" data-bs-target="#detailModal{{ $p->id }}">
-                                            <i class="bi bi-eye me-1"></i> Lihat Detail Lengkap
-                                        </button>
+                                        <div class="row">
+                                            <div class="col-md-6">
+
+                                                <button type="button" class="btn btn-outline-info btn-sm w-100"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detailModal{{ $p->id }}">
+                                                    <i class="bi bi-eye me-1"></i> Lihat Detail Lengkap
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <a type="button" href="/download-surat/{{ $p->id }}"
+                                                    class="btn btn-outline-success btn-sm w-100">
+                                                    <i class="bi bi-eye me-1"></i> Lihat Surat Sistem
+                                                </a>
+                                            </div>
+                                        </div>
                                     @else
                                         <div class="text-center">
                                             <small class="text-muted">Tidak ada detail tambahan</small>

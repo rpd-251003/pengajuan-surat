@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Auth\LoginRequest;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -25,19 +27,30 @@ class AuthenticatedSessionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        $loginField = $request->email;
+        $password = $request->password;
+
+        // Coba login dengan email dulu
+        $user = User::where('email', $loginField)->first();
+
+        // Jika tidak ditemukan dengan email, coba dengan nomor_identifikasi (NIM)
+        if (!$user) {
+            $user = User::where('nomor_identifikasi', $loginField)->first();
+        }
+
+        // Verifikasi password
+        if (!$user || !Hash::check($password, $user->password)) {
             return back()->withErrors([
-                'email' => 'Email atau password salah.',
+                'email' => 'Email/NIM atau password salah.',
             ]);
         }
 
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
-
-        $user = Auth::user();
 
         // Redirect berdasarkan role
         return match ($user->role) {

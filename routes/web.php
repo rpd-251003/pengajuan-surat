@@ -20,6 +20,8 @@ use App\Http\Controllers\KaprodiTahunanController;
 use App\Http\Controllers\PengajuanSuratController;
 use App\Http\Controllers\JenisSuratFieldController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\SuratTemplateController;
+use App\Http\Controllers\PDFGeneratorController;
 
 
 Route::get('/', function () {
@@ -35,6 +37,29 @@ Route::middleware(['auth', RoleMiddleware::class . ':dosen'])->group(function ()
     Route::get('/dosen/dashboard', [HomeController::class, 'index_admin'])->name('dosenpa.dashboard');
 });
 
+Route::middleware(['auth'])->group(function () {
+
+    // Template CRUD
+    Route::resource('template', SuratTemplateController::class);
+    Route::get('template-data', [SuratTemplateController::class, 'getData'])->name('template.getData');
+    Route::post('template/toggle-status/{id}', [SuratTemplateController::class, 'toggleStatus'])->name('template.toggleStatus');
+    Route::get('template/preview/{id}', [SuratTemplateController::class, 'preview'])->name('template.preview');
+    Route::get('template/by-jenis/{jenisId}', [SuratTemplateController::class, 'getTemplatesByJenis'])->name('template.byJenis');
+
+    // PDF Generation Routes
+    Route::post('generate-pdf/{pengajuanId}', [PDFGeneratorController::class, 'generateSuratPDF'])->name('generate.pdf');
+    Route::get('preview-surat/{pengajuanId}', [PDFGeneratorController::class, 'previewSurat'])->name('preview.surat');
+    Route::get('download-surat/{pengajuanId}', [PDFGeneratorController::class, 'downloadSurat'])->name('download.surat');
+    Route::post('bulk-generate-pdf', [PDFGeneratorController::class, 'bulkGenerate'])->name('bulk.generate.pdf');
+
+});
+
+// API Routes for AJAX calls
+Route::middleware(['auth'])->prefix('api')->group(function () {
+    Route::get('template/{id}', [SuratTemplateController::class, 'show']);
+    Route::delete('template/{id}', [SuratTemplateController::class, 'destroy']);
+    Route::post('template/toggle-status/{id}', [SuratTemplateController::class, 'toggleStatus']);
+});
 // Kaprodi
 Route::middleware(['auth', RoleMiddleware::class . ':kaprodi'])->group(function () {
     Route::get('/kaprodi/dashboard', [HomeController::class, 'index_admin'])->name('kaprodi.dashboard');

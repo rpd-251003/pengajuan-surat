@@ -10,8 +10,11 @@
     <meta name="keywords" content="Mantis, Dashboard UI Kit, Bootstrap 5, Admin Template">
     <meta name="author" content="CodedThemes">
 
-    <link rel="icon" href="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
+    <link rel="icon" href="https://lpm1.unsada.ac.id/wp-content/uploads/2021/07/logo-unsada-asli-300x300-1.png"
+        type="image/x-icon">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
+        id="main-font-link">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/tabler-icons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('v1/dist/assets/fonts/fontawesome.css') }}">
@@ -42,11 +45,12 @@
                         </div>
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
-                            <div class="form-group mb-3">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" name="email"
-                                    class="form-control @error('email') is-invalid @enderror"
-                                    placeholder="Email Address" required autofocus value="{{ old('email') }}">
+                            <!-- resources/views/auth/login.blade.php -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email / NIM</label>
+                                <input type="text" class="form-control @error('email') is-invalid @enderror"
+                                    id="email" name="email" value="{{ old('email') }}"
+                                    placeholder="Masukkan email atau NIM" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -55,8 +59,8 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">Password</label>
                                 <input type="password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Password" required>
+                                    class="form-control @error('password') is-invalid @enderror" placeholder="Password"
+                                    required>
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

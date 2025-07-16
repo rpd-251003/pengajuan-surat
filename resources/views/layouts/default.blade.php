@@ -146,6 +146,12 @@
                                 <span class="pc-mtext">Jenis Surat</span>
                             </a>
                         </li>
+                        <li class="pc-item">
+                            <a href="{{ url('/template') }}" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+                                <span class="pc-mtext">Template Surat</span>
+                            </a>
+                        </li>
 
                         <li class="pc-item pc-caption">
                             <label>Data Master</label>

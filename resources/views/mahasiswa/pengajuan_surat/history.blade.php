@@ -159,59 +159,6 @@
                                                         <i class="fas fa-arrow-right text-muted me-3"
                                                             style="font-size: 10px;"></i>
 
-                                                        <!-- Wadek1 -->
-                                                        <div class="text-center me-3">
-                                                            <div class="position-relative">
-                                                                @if ($pengajuan->approved_at_wadek1)
-                                                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                                        style="width: 12px; height: 12px;">
-                                                                        <i class="fas fa-check text-white"
-                                                                            style="font-size: 8px;"></i>
-                                                                    </div>
-                                                                @else
-                                                                    <div class="bg-secondary rounded-circle"
-                                                                        style="width: 12px; height: 12px;"></div>
-                                                                @endif
-                                                            </div>
-                                                            <small class="d-block mt-1" style="font-size: 10px;">
-                                                                Wadek1<br>
-                                                                @if ($pengajuan->approved_by_wadek1)
-                                                                    <span
-                                                                        class="text-muted">{{ $pengajuan->wadek1->name ?? 'N/A' }}</span>
-                                                                @else
-                                                                    <span class="text-warning">Waiting..</span>
-                                                                @endif
-                                                            </small>
-                                                        </div>
-
-                                                        <!-- Arrow -->
-                                                        <i class="fas fa-arrow-right text-muted me-3"
-                                                            style="font-size: 10px;"></i>
-
-                                                        <!-- Staff TU -->
-                                                        <div class="text-center">
-                                                            <div class="position-relative">
-                                                                @if ($pengajuan->approved_at_staff_tu)
-                                                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                                        style="width: 12px; height: 12px;">
-                                                                        <i class="fas fa-check text-white"
-                                                                            style="font-size: 8px;"></i>
-                                                                    </div>
-                                                                @else
-                                                                    <div class="bg-secondary rounded-circle"
-                                                                        style="width: 12px; height: 12px;"></div>
-                                                                @endif
-                                                            </div>
-                                                            <small class="d-block mt-1" style="font-size: 10px;">
-                                                                TU (Rilis)<br>
-                                                                @if ($pengajuan->approved_by_staff_tu)
-                                                                    <span
-                                                                        class="text-muted">{{ $pengajuan->staffTU->name ?? 'N/A' }}</span>
-                                                                @else
-                                                                    <span class="text-warning">Waiting..</span>
-                                                                @endif
-                                                            </small>
-                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td>

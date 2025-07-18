@@ -99,66 +99,51 @@
                                                     <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
                                                 </td>
                                                 <td>
-                                                    <!-- Timeline Approval -->
+                                                    <!-- Dynamic Timeline Approval -->
                                                     <div class="d-flex align-items-center">
-                                                        <!-- Dosen PA -->
-                                                        <div class="text-center me-3">
-                                                            <div class="position-relative">
-                                                                @if ($pengajuan->approved_at_dosen_pa)
-                                                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                                        style="width: 12px; height: 12px;">
-                                                                        <i class="fas fa-check text-white"
-                                                                            style="font-size: 8px;"></i>
-                                                                    </div>
-                                                                @else
-                                                                    <div class="bg-secondary rounded-circle"
-                                                                        style="width: 12px; height: 12px;"></div>
-                                                                @endif
+                                                        @php
+                                                            $approvalFlow = $pengajuan->jenisSurat->getApprovalFlow();
+                                                            $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
+                                                            $approvalHistory = $pengajuan->getApprovalHistory();
+                                                        @endphp
+                                                        
+                                                        @foreach($approvalFlow as $index => $role)
+                                                            @php
+                                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                                                $approverName = $approvalHistory[$role]['approver_name'] ?? 'N/A';
+                                                            @endphp
+                                                            
+                                                            <!-- Role Step -->
+                                                            <div class="text-center me-3">
+                                                                <div class="position-relative">
+                                                                    @if($isApproved)
+                                                                        <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                                            style="width: 12px; height: 12px;">
+                                                                            <i class="fas fa-check text-white"
+                                                                                style="font-size: 8px;"></i>
+                                                                        </div>
+                                                                    @else
+                                                                        <div class="bg-secondary rounded-circle"
+                                                                            style="width: 12px; height: 12px;"></div>
+                                                                    @endif
+                                                                </div>
+                                                                <small class="d-block mt-1" style="font-size: 10px;">
+                                                                    {{ $roleDisplayName }}<br>
+                                                                    @if($isApproved)
+                                                                        <span class="text-muted">{{ $approverName }}</span>
+                                                                    @else
+                                                                        <span class="text-warning">Waiting..</span>
+                                                                    @endif
+                                                                </small>
                                                             </div>
-                                                            <small class="d-block mt-1" style="font-size: 10px;">
-                                                                Dosen PA<br>
-                                                                @if ($pengajuan->approved_by_dosen_pa)
-                                                                    <span
-                                                                        class="text-muted">{{ $pengajuan->dosenPA->name ?? 'N/A' }}</span>
-                                                                @else
-                                                                    <span class="text-warning">Waiting..</span>
-                                                                @endif
-                                                            </small>
-                                                        </div>
 
-                                                        <!-- Arrow -->
-                                                        <i class="fas fa-arrow-right text-muted me-3"
-                                                            style="font-size: 10px;"></i>
-
-                                                        <!-- Kaprodi -->
-                                                        <div class="text-center me-3">
-                                                            <div class="position-relative">
-                                                                @if ($pengajuan->approved_at_kaprodi)
-                                                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                                        style="width: 12px; height: 12px;">
-                                                                        <i class="fas fa-check text-white"
-                                                                            style="font-size: 8px;"></i>
-                                                                    </div>
-                                                                @else
-                                                                    <div class="bg-secondary rounded-circle"
-                                                                        style="width: 12px; height: 12px;"></div>
-                                                                @endif
-                                                            </div>
-                                                            <small class="d-block mt-1" style="font-size: 10px;">
-                                                                Kaprodi<br>
-                                                                @if ($pengajuan->approved_by_kaprodi)
-                                                                    <span
-                                                                        class="text-muted">{{ $pengajuan->kaprodi->name ?? 'N/A' }}</span>
-                                                                @else
-                                                                    <span class="text-warning">Waiting..</span>
-                                                                @endif
-                                                            </small>
-                                                        </div>
-
-                                                        <!-- Arrow -->
-                                                        <i class="fas fa-arrow-right text-muted me-3"
-                                                            style="font-size: 10px;"></i>
-
+                                                            <!-- Arrow (except for last item) -->
+                                                            @if($index < count($approvalFlow) - 1)
+                                                                <i class="fas fa-arrow-right text-muted me-3"
+                                                                    style="font-size: 10px;"></i>
+                                                            @endif
+                                                        @endforeach
                                                     </div>
                                                 </td>
                                                 <td>
@@ -260,78 +245,48 @@
                                 <div class="card border-0 bg-light">
                                     <div class="card-body p-3">
                                         <h6 class="mb-2"><i class="fas fa-users me-1"></i> Timeline Approval</h6>
-                                        <!-- Dosen PA -->
-                                        <div class="d-flex align-items-center mb-2">
-                                            @if ($pengajuan->approved_at_dosen_pa)
-                                                <i class="fas fa-check-circle text-success me-2"></i>
-                                            @else
-                                                <i class="fas fa-clock text-warning me-2"></i>
-                                            @endif
-                                            <div>
-                                                <strong>Dosen PA:</strong> {{ $pengajuan->dosenPA->name ?? 'Belum ditentukan' }}<br>
-                                                <small class="text-muted">
-                                                    @if ($pengajuan->approved_at_dosen_pa)
-                                                        Disetujui: {{ \Carbon\Carbon::parse($pengajuan->approved_at_dosen_pa)->format('d/m/Y H:i') }}
-                                                    @else
-                                                        Menunggu persetujuan
-                                                    @endif
-                                                </small>
+                                        @php
+                                            $approvalFlow = $pengajuan->jenisSurat->getApprovalFlow();
+                                            $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
+                                            $approvalHistory = $pengajuan->getApprovalHistory();
+                                        @endphp
+                                        
+                                        @foreach($approvalFlow as $index => $role)
+                                            @php
+                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                                $approverName = $approvalHistory[$role]['approver_name'] ?? 'Belum ditentukan';
+                                                $approvedAt = $approvalHistory[$role]['approved_at'] ?? null;
+                                                $isLastStep = $index === count($approvalFlow) - 1;
+                                            @endphp
+                                            
+                                            <!-- Role Step -->
+                                            <div class="d-flex align-items-center {{ $isLastStep ? '' : 'mb-2' }}">
+                                                @if($isApproved)
+                                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                                @else
+                                                    <i class="fas fa-clock text-warning me-2"></i>
+                                                @endif
+                                                <div>
+                                                    <strong>{{ $roleDisplayName }}:</strong> {{ $approverName }}<br>
+                                                    <small class="text-muted">
+                                                        @if($isApproved && $approvedAt)
+                                                            @if($isLastStep)
+                                                                Selesai: {{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}
+                                                            @else
+                                                                Disetujui: {{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}
+                                                            @endif
+                                                        @else
+                                                            @if($isLastStep)
+                                                                Menunggu pemrosesan
+                                                            @else
+                                                                Menunggu persetujuan
+                                                            @endif
+                                                        @endif
+                                                    </small>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <!-- Kaprodi -->
-                                        <div class="d-flex align-items-center mb-2">
-                                            @if ($pengajuan->approved_at_kaprodi)
-                                                <i class="fas fa-check-circle text-success me-2"></i>
-                                            @else
-                                                <i class="fas fa-clock text-warning me-2"></i>
-                                            @endif
-                                            <div>
-                                                <strong>Kaprodi:</strong> {{ $pengajuan->kaprodi->name ?? 'Belum ditentukan' }}<br>
-                                                <small class="text-muted">
-                                                    @if ($pengajuan->approved_at_kaprodi)
-                                                        Disetujui: {{ \Carbon\Carbon::parse($pengajuan->approved_at_kaprodi)->format('d/m/Y H:i') }}
-                                                    @else
-                                                        Menunggu persetujuan
-                                                    @endif
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <!-- Wadek1 -->
-                                        <div class="d-flex align-items-center mb-2">
-                                            @if ($pengajuan->approved_at_wadek1)
-                                                <i class="fas fa-check-circle text-success me-2"></i>
-                                            @else
-                                                <i class="fas fa-clock text-warning me-2"></i>
-                                            @endif
-                                            <div>
-                                                <strong>Wadek 1:</strong> {{ $pengajuan->wadek1->name ?? 'Belum ditentukan' }}<br>
-                                                <small class="text-muted">
-                                                    @if ($pengajuan->approved_at_wadek1)
-                                                        Disetujui: {{ \Carbon\Carbon::parse($pengajuan->approved_at_wadek1)->format('d/m/Y H:i') }}
-                                                    @else
-                                                        Menunggu persetujuan
-                                                    @endif
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <!-- Staff TU -->
-                                        <div class="d-flex align-items-center">
-                                            @if ($pengajuan->approved_at_staff_tu)
-                                                <i class="fas fa-check-circle text-success me-2"></i>
-                                            @else
-                                                <i class="fas fa-clock text-warning me-2"></i>
-                                            @endif
-                                            <div>
-                                                <strong>Staff TU:</strong> {{ $pengajuan->staffTU->name ?? 'Belum ditentukan' }}<br>
-                                                <small class="text-muted">
-                                                    @if ($pengajuan->approved_at_staff_tu)
-                                                        Selesai: {{ \Carbon\Carbon::parse($pengajuan->approved_at_staff_tu)->format('d/m/Y H:i') }}
-                                                    @else
-                                                        Menunggu pemrosesan
-                                                    @endif
-                                                </small>
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

@@ -14,11 +14,7 @@
                     <tr>
                         <th>Nama</th>
                         <th>Email</th>
-                        <th> @if (Auth::user()->role == 'mahasiswa')
-                                                NIM
-                                            @else
-                                                NIP / NIDN
-                                            @endif</th>
+                        <th>NIM</th>
                         <th>Fakultas</th>
                         <th>Prodi</th>
                         <th>Angkatan</th>

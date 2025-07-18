@@ -74,10 +74,17 @@ Route::middleware(['auth', RoleMiddleware::class . ':wadek1'])->group(function (
     Route::post('/wadek1/reject/{id}', [WadekController::class, 'reject']);
 });
 
-// Wadek
+// Mahasiswa
 Route::middleware(['auth', RoleMiddleware::class . ':mahasiswa'])->group(function () {
     Route::get('/mahasiswa/dashboard', [HomeController::class, 'index_mahasiswa'])->name('mahasiswa.dashboard');
     Route::get('/pengajuan-surat/history', [PengajuanSuratController::class, 'history'])->name('pengajuan_surat.history');
+});
+
+// BAK
+Route::middleware(['auth', RoleMiddleware::class . ':bak'])->group(function () {
+    Route::get('/bak/dashboard', [HomeController::class, 'index_admin'])->name('bak.dashboard');
+    Route::post('/bak/approve/{id}', [PengajuanSuratController::class, 'approveBAK']);
+    Route::post('/bak/reject/{id}', [PengajuanSuratController::class, 'rejectBAK']);
 });
 
 
@@ -86,6 +93,11 @@ Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
     Route::get('/tu/dashboard', [HomeController::class, 'index_admin'])->name('tu.dashboard');
     Route::get('/tu/laporan', [TuController::class, 'laporanBulanan'])->name('tu.laporan');
 
+    // Import/Export routes (harus di atas resource route)
+    Route::post('users/import', [UsersController::class, 'importMahasiswa'])->name('users.import');
+    Route::get('users/export', [UsersController::class, 'exportMahasiswa'])->name('users.export');
+    Route::get('users/sample', [UsersController::class, 'downloadSample'])->name('users.sample');
+    
     Route::resource('users', UsersController::class);
 
     Route::resource('file-approvals', FileApprovalController::class)->except(['create', 'edit', 'show']);
@@ -182,6 +194,11 @@ Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {
     Route::patch('/{id}/reject_wadek1', [PengajuanSuratController::class, 'rejectWadek1'])->name('admin.pengajuan.reject_wadek1');
     Route::patch('/{id}/reject_staff_tu', [PengajuanSuratController::class, 'rejectStaffTU'])->name('admin.pengajuan.reject_staff_tu');
     Route::patch('/{id}/reject_double', [PengajuanSuratController::class, 'rejectDouble'])->name('admin.pengajuan.reject_double');
+    Route::patch('/{id}/reject_bak', [PengajuanSuratController::class, 'rejectBAK'])->name('admin.pengajuan.reject_bak');
+    
+    // Dynamic approval methods
+    Route::patch('/{id}/approve_dynamic', [PengajuanSuratController::class, 'approveDynamic'])->name('admin.pengajuan.approve_dynamic');
+    Route::patch('/{id}/reject_dynamic', [PengajuanSuratController::class, 'rejectDynamic'])->name('admin.pengajuan.reject_dynamic');
 });
 Route::middleware('auth')->group(function () {
     // File operations

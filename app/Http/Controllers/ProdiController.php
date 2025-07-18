@@ -41,10 +41,11 @@ class ProdiController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
+            'kode' => 'nullable|string|max:5|unique:prodis,kode',
             'fakultas_id' => 'required|exists:fakultas,id',
         ]);
 
-        Prodi::create($request->only('nama', 'fakultas_id'));
+        Prodi::create($request->only('nama', 'kode', 'fakultas_id'));
 
         return response()->json(['success' => true, 'message' => 'Prodi berhasil ditambahkan']);
     }
@@ -61,11 +62,12 @@ class ProdiController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
+            'kode' => 'nullable|string|max:5|unique:prodis,kode,'.$id,
             'fakultas_id' => 'required|exists:fakultas,id',
         ]);
 
         $prodi = Prodi::findOrFail($id);
-        $prodi->update($request->only('nama', 'fakultas_id'));
+        $prodi->update($request->only('nama', 'kode', 'fakultas_id'));
 
         return response()->json(['success' => true, 'message' => 'Prodi berhasil diupdate']);
     }

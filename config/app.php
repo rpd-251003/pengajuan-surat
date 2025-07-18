@@ -65,9 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'Asia/Jakarta',
-    'locale' => 'id',
-    'faker_locale' => 'id_ID',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     /*
     |--------------------------------------------------------------------------
@@ -79,6 +77,34 @@ return [
     | set to any locale for which you plan to have translation strings.
     |
     */
+
+    'locale' => env('APP_LOCALE', 'id'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Fallback Locale
+    |--------------------------------------------------------------------------
+    |
+    | The fallback locale determines the locale to use when the current one
+    | is not available. You may change the value to correspond to any of
+    | the language folders that are provided through your application.
+    |
+    */
+
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'id'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Faker Locale
+    |--------------------------------------------------------------------------
+    |
+    | This locale will be used by the Faker PHP library when generating fake
+    | data for your database seeds. For example, this will be used to get
+    | localized telephone numbers, street address information and more.
+    |
+    */
+
+    'faker_locale' => env('APP_FAKER_LOCALE', 'id_ID'),
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

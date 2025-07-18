@@ -110,6 +110,9 @@ class PengajuanSuratController extends Controller
 
             \Log::info('Pengajuan created successfully', $pengajuan->toArray());
 
+            // Initialize dynamic approval flow
+            $pengajuan->initializeApprovalFlow();
+
             // Simpan detail pengajuan dengan auto fields
             $this->storeDetailsWithAutoFields($request, $pengajuan->id);
 
@@ -407,18 +410,76 @@ class PengajuanSuratController extends Controller
     }
 
     public function index_dosen()
-    {
-        $login_id = Auth::user()->id;
-        $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])
-            ->where(function ($query) use ($login_id) {
-                $query->where('approved_by_dosen_pa', $login_id)
-                    ->orWhere('approved_by_kaprodi', $login_id);
-            })
-            ->orderBy('id', 'desc')
-            ->get();
+{
+    $user = Auth::user();
+    $login_id = $user->id;
 
-        return view('admin.pengajuan_surat.role.index', compact('pengajuanSurats'));
-    }
+    $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])
+        ->orderBy('id', 'desc')
+        ->get()
+        ->filter(function ($pengajuan) use ($user, $login_id) {
+            if (!$pengajuan->jenisSurat) {
+                return false;
+            }
+
+            // CEK APAKAH DIA APPROVER AKTIF
+            if (
+                !$pengajuan->approved_by_dosen_pa &&
+                $user->canApproveAsDosenPA($pengajuan->tahun_angkatan, $pengajuan->prodi_id)
+            ) {
+                return true;
+            }
+
+            if (
+                $pengajuan->approved_by_dosen_pa && // Sudah approved oleh dosen_pa
+                !$pengajuan->approved_by_kaprodi &&
+                $user->canApproveAsKaprodi($pengajuan->tahun_angkatan, $pengajuan->prodi_id)
+            ) {
+                return true;
+            }
+
+            if (
+                $pengajuan->approved_by_kaprodi &&
+                !$pengajuan->approved_by_wadek1 &&
+                $user->hasRole('wadek1')
+            ) {
+                return true;
+            }
+
+            if (
+                $pengajuan->approved_by_wadek1 &&
+                !$pengajuan->approved_by_staff_tu &&
+                $user->hasRole('tu')
+            ) {
+                return true;
+            }
+
+            if (
+                $pengajuan->approved_by_staff_tu &&
+                !$pengajuan->approved_by_bak &&
+                $user->hasRole('bak')
+            ) {
+                return true;
+            }
+
+            // CEK APAKAH DIA MEMANG YANG SUDAH APPROVE (HISTORI)
+            if (
+                $pengajuan->approved_by_dosen_pa == $login_id ||
+                $pengajuan->approved_by_kaprodi == $login_id ||
+                $pengajuan->approved_by_wadek1 == $login_id ||
+                $pengajuan->approved_by_staff_tu == $login_id ||
+                $pengajuan->approved_by_bak == $login_id
+            ) {
+                return true;
+            }
+
+            return false;
+        });
+
+    return view('admin.pengajuan_surat.role.index', compact('pengajuanSurats'));
+}
+
+
 
     // ================= Approval Methods (unchanged) =================
 
@@ -630,8 +691,8 @@ class PengajuanSuratController extends Controller
 
         $pengajuan = PengajuanSurat::findOrFail($id);
 
-        // Check if user has TU role
-        if (!Auth::user()->hasRole('tu')) {
+        // Check if user has TU or BAK role
+        if (!Auth::user()->hasRole(['tu', 'bak'])) {
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk upload surat.');
         }
 
@@ -656,5 +717,126 @@ class PengajuanSuratController extends Controller
             ]);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat upload surat.');
         }
+    }
+
+    // ================= Dynamic Approval Methods =================
+
+    /**
+     * Generic approve method for dynamic workflow
+     */
+    public function approveDynamic(Request $request, $id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+        $user = Auth::user();
+
+        // Get current step
+        $currentStep = $pengajuan->current_step;
+
+        if (!$currentStep) {
+            return redirect()->back()->with('error', 'Pengajuan sudah selesai diproses.');
+        }
+
+        // Check if user can approve current step
+        if (!$pengajuan->canBeApprovedBy($user)) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menyetujui pengajuan ini.');
+        }
+
+        // Check if already approved
+        if ($pengajuan->isApprovedByStep($currentStep)) {
+            return redirect()->back()->with('error', 'Pengajuan sudah disetujui sebelumnya.');
+        }
+
+        // Approve the pengajuan
+        $pengajuan->approveByStep($currentStep, $user->id);
+
+        // Get step display name
+        $stepNames = [
+            'dosen_pa' => 'Dosen PA',
+            'kaprodi' => 'Kaprodi',
+            'wadek1' => 'Wadek 1',
+            'tu' => 'TU',
+            'bak' => 'BAK'
+        ];
+
+        $stepName = $stepNames[$currentStep] ?? $currentStep;
+
+        return redirect()->back()->with('success', "Pengajuan berhasil disetujui oleh $stepName.");
+    }
+
+    /**
+     * Generic reject method for dynamic workflow
+     */
+    public function rejectDynamic(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_reject' => 'required|string',
+        ]);
+
+        $pengajuan = PengajuanSurat::findOrFail($id);
+        $user = Auth::user();
+
+        // Get current step
+        $currentStep = $pengajuan->current_step;
+
+        if (!$currentStep) {
+            return redirect()->back()->with('error', 'Pengajuan sudah selesai diproses.');
+        }
+
+        // Check if user can reject current step
+        if (!$pengajuan->canBeApprovedBy($user)) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menolak pengajuan ini.');
+        }
+
+        // Reject the pengajuan
+        $pengajuan->rejectByStep($currentStep, $user->id, $request->alasan_reject);
+
+        // Get step display name
+        $stepNames = [
+            'dosen_pa' => 'Dosen PA',
+            'kaprodi' => 'Kaprodi',
+            'wadek1' => 'Wadek 1',
+            'tu' => 'TU',
+            'bak' => 'BAK'
+        ];
+
+        $stepName = $stepNames[$currentStep] ?? $currentStep;
+
+        return redirect()->back()->with('success', "Pengajuan berhasil ditolak oleh $stepName.");
+    }
+
+    /**
+     * BAK specific approval methods
+     */
+    public function approveBAK($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        if ($pengajuan->approved_at_bak) {
+            return redirect()->back()->with('error', 'Sudah disetujui sebelumnya.');
+        }
+
+        $pengajuan->approved_by_bak = Auth::id();
+        $pengajuan->approved_at_bak = now();
+        $pengajuan->save();
+
+        $this->updateStatusAfterApproval($pengajuan, 'approved_at_bak');
+
+        return redirect()->back()->with('success', 'Disetujui oleh BAK.');
+    }
+
+    public function rejectBAK(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_reject' => 'required|string',
+        ]);
+
+        $pengajuan = PengajuanSurat::findOrFail($id);
+        $pengajuan->approved_by_bak = null;
+        $pengajuan->approved_at_bak = null;
+        $pengajuan->status = 'ditolak';
+        $pengajuan->keterangan = 'Ditolak oleh BAK: ' . $request->alasan_reject;
+        $pengajuan->save();
+
+        return redirect()->back()->with('success', 'Pengajuan berhasil ditolak oleh BAK.');
     }
 }

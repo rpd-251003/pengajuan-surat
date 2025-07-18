@@ -366,7 +366,7 @@
     </div>
   </section>
 
-  <!-- Call to Action Section -->
+
   <section id="pengajuan">
     <div class="container">
       <h2>Ajukan Surat Anda Sekarang</h2>
@@ -375,12 +375,13 @@
     </div>
   </section>
 
-  <!-- Footer -->
+
   <footer>
     <div class="container">
       <p>&copy; 2025 Universitas Darma Persada. All Rights Reserved.</p>
     </div>
   </footer>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

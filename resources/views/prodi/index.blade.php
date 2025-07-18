@@ -16,6 +16,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Nama Prodi</th>
+                            <th>Kode</th>
                             <th>Fakultas</th>
                             <th>Aksi</th>
                         </tr>
@@ -40,6 +41,11 @@
                         <div class="mb-3">
                             <label for="nama" class="form-label">Nama Prodi</label>
                             <input type="text" class="form-control" id="nama" name="nama" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="kode" class="form-label">Kode Prodi</label>
+                            <input type="text" class="form-control" id="kode" name="kode" maxlength="5" placeholder="Contoh: 21, 22, 23">
+                            <div class="form-text">Kode untuk parsing NIM mahasiswa (21=Teknik Elektro, 22=Teknik Industri, dst)</div>
                         </div>
                         <div class="mb-3">
                             <label for="fakultas_id" class="form-label">Fakultas</label>
@@ -81,6 +87,10 @@
                         name: 'nama'
                     },
                     {
+                        data: 'kode',
+                        name: 'kode'
+                    },
+                    {
                         data: 'fakultas',
                         name: 'fakultas.nama'
                     },
@@ -108,6 +118,7 @@
             $('#btn-add').click(function() {
                 $('#prodiForm')[0].reset();
                 $('#prodi_id').val('');
+                $('#kode').val('');
                 loadFakultas();
                 modal.show();
             });
@@ -118,6 +129,7 @@
                 $.get('/prodi/' + id + '/edit', function(res) {
                     $('#prodi_id').val(res.prodi.id);
                     $('#nama').val(res.prodi.nama);
+                    $('#kode').val(res.prodi.kode);
                     loadFakultas(res.prodi.fakultas_id);
                     modal.show();
                 });

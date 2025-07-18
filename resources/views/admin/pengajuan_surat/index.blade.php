@@ -186,131 +186,48 @@
                                     </div>
                                 </div>
 
-                                <!-- Timeline Status -->
+                                <!-- Dynamic Timeline Status -->
                                 <div class="timeline-status">
-                                    <div class="d-flex align-items-center mb-2">
+                                    @php
+                                        $approvalFlow = $p->jenisSurat->getApprovalFlow();
+                                        $availableRoles = $p->jenisSurat::getAvailableApprovalRoles();
+                                        $approvalHistory = $p->getApprovalHistory();
+                                    @endphp
+                                    
+                                    @foreach($approvalFlow as $index => $role)
                                         @php
-                                            $isDosenPAApproved = $p->approved_by_dosen_pa && $p->approved_at_dosen_pa;
+                                            $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                            $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                            $isLastStep = $index === count($approvalFlow) - 1;
                                         @endphp
-                                        <div class="timeline-icon me-2">
-                                            @if ($isDosenPAApproved)
-                                                <span class="badge bg-success rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
-                                                    </svg>
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-                                                        <path
-                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-                                                    </svg>
-                                                </span>
-                                            @endif
+                                        
+                                        <div class="d-flex align-items-center {{ $isLastStep ? '' : 'mb-2' }}">
+                                            <div class="timeline-icon me-2">
+                                                @if($isApproved)
+                                                    <span class="badge bg-success rounded-circle p-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                            fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                            <path
+                                                                d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
+                                                        </svg>
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-secondary rounded-circle p-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                            fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                                                            <path
+                                                                d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                                            <path
+                                                                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                                        </svg>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <small class="timeline-text {{ $isApproved ? 'text-success' : 'text-muted' }}">
+                                                {{ $roleDisplayName }} {{ $isApproved ? 'Approved' : 'Pending' }}
+                                            </small>
                                         </div>
-                                        <small
-                                            class="timeline-text {{ $isDosenPAApproved ? 'text-success' : 'text-muted' }}">
-                                            Dosen PA {{ $isDosenPAApproved ? 'Approved' : 'Pending' }}
-                                        </small>
-                                    </div>
-
-                                    <div class="d-flex align-items-center mb-2">
-                                        @php
-                                            $isKaprodiApproved = $p->approved_by_kaprodi && $p->approved_at_kaprodi;
-                                        @endphp
-                                        <div class="timeline-icon me-2">
-                                            @if ($isKaprodiApproved)
-                                                <span class="badge bg-success rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
-                                                    </svg>
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-                                                        <path
-                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-                                                    </svg>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <small
-                                            class="timeline-text {{ $isKaprodiApproved ? 'text-success' : 'text-muted' }}">
-                                            Kaprodi {{ $isKaprodiApproved ? 'Approved' : 'Pending' }}
-                                        </small>
-                                    </div>
-
-                                    <div class="d-flex align-items-center mb-2">
-                                        @php
-                                            $isWadek1Approved = $p->approved_by_wadek1 && $p->approved_at_wadek1;
-                                        @endphp
-                                        <div class="timeline-icon me-2">
-                                            @if ($isWadek1Approved)
-                                                <span class="badge bg-success rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
-                                                    </svg>
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-                                                        <path
-                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-                                                    </svg>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <small
-                                            class="timeline-text {{ $isWadek1Approved ? 'text-success' : 'text-muted' }}">
-                                            Wadek 1 {{ $isWadek1Approved ? 'Approved' : 'Pending' }}
-                                        </small>
-                                    </div>
-
-                                    <div class="d-flex align-items-center">
-                                        @php
-                                            $isStaffTUApproved = $p->approved_by_staff_tu && $p->approved_at_staff_tu;
-                                        @endphp
-                                        <div class="timeline-icon me-2">
-                                            @if ($isStaffTUApproved)
-                                                <span class="badge bg-success rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z" />
-                                                    </svg>
-                                                </span>
-                                            @else
-                                                <span class="badge bg-secondary rounded-circle p-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-                                                        <path
-                                                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-                                                    </svg>
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <small
-                                            class="timeline-text {{ $isStaffTUApproved ? 'text-success' : 'text-muted' }}">
-                                            Staff TU {{ $isStaffTUApproved ? 'Approved' : 'Pending' }}
-                                        </small>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                             <div class="card-footer bg-light">
@@ -709,86 +626,42 @@
                                 <div class="card border-0 bg-light">
                                     <div class="card-body p-3">
                                         <h6 class="mb-2"><i class="fas fa-tasks me-1"></i> Status Persetujuan</h6>
-
-                                        <!-- Dosen PA -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_dosen_pa ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Dosen PA:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->dosenPa->name ?? 'Belum ditentukan' }}</small>
+                                        @php
+                                            $approvalFlow = $pengajuan->jenisSurat->getApprovalFlow();
+                                            $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
+                                            $approvalHistory = $pengajuan->getApprovalHistory();
+                                        @endphp
+                                        
+                                        @foreach($approvalFlow as $index => $role)
+                                            @php
+                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                                $approverName = $approvalHistory[$role]['approver_name'] ?? 'Belum ditentukan';
+                                                $approvedAt = $approvalHistory[$role]['approved_at'] ?? null;
+                                                $isLastStep = $index === count($approvalFlow) - 1;
+                                            @endphp
+                                            
+                                            <!-- Dynamic Role Step -->
+                                            <div class="d-flex justify-content-between align-items-center {{ $isLastStep ? '' : 'mb-2' }} p-2 rounded"
+                                                style="background-color: {{ $isApproved ? '#d4edda' : '#f8d7da' }}">
+                                                <div>
+                                                    <strong>{{ $roleDisplayName }}:</strong><br>
+                                                    <small class="text-muted">{{ $approverName }}</small>
+                                                </div>
+                                                <div>
+                                                    @if($isApproved)
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check me-1"></i>Approved
+                                                        </span>
+                                                        @if($approvedAt)
+                                                            <br><small>{{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}</small>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_dosen_pa)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_dosen_pa }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Kaprodi -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_kaprodi ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Kaprodi:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->kaprodi->name ?? 'Belum ditentukan' }}</small>
-                                            </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_kaprodi)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_kaprodi }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Wadek 1 -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_wadek1 ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Wadek 1:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->wadek1->name ?? 'Belum ditentukan' }}</small>
-                                            </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_wadek1)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_wadek1 }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Staff TU -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_staff_tu ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Staff TU:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->staffTu->name ?? 'Belum ditentukan' }}</small>
-                                            </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_staff_tu)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_staff_tu }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

@@ -40,15 +40,17 @@
                     <option value="">Pilih Role</option>
                     <option value="mahasiswa" {{ $user->role == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
                     <option value="dosen" {{ $user->role == 'dosen' ? 'selected' : '' }}>Dosen</option>
+                    <option value="kaprodi" {{ $user->role == 'kaprodi' ? 'selected' : '' }}>Kaprodi</option>
                     <option value="wadek1" {{ $user->role == 'wadek1' ? 'selected' : '' }}>Wadek 1</option>
                     <option value="tu" {{ $user->role == 'tu' ? 'selected' : '' }}>TU</option>
+                    <option value="bak" {{ $user->role == 'bak' ? 'selected' : '' }}>BAK</option>
                 </select>
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
-                <label for="nomor_identifikasi" class="form-label">NIM atau NIP / NIDN</label>
-                <input type="text" class="form-control" id="nomor_identifikasi" name="nomor_identifikasi" value="{{ $user->nomor_identifikasi }}" placeholder="NIP/NIM/NIDN">
+                <label for="nomor_identifikasi" class="form-label">NIM / NIP / NIDN</label>
+                <input type="text" class="form-control" id="nomor_identifikasi" name="nomor_identifikasi" value="{{ $user->nomor_identifikasi }}" placeholder="Masukkan NIM/NIP/NIDN">
             </div>
         </div>
     </div>

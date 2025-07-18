@@ -114,85 +114,52 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <!-- Progress Timeline -->
+                                    <!-- Dynamic Progress Timeline -->
+                                    @php
+                                        $approvalFlow = $latestPengajuan->jenisSurat->getApprovalFlow();
+                                        $availableRoles = $latestPengajuan->jenisSurat::getAvailableApprovalRoles();
+                                        $approvalHistory = $latestPengajuan->getApprovalHistory();
+                                    @endphp
+                                    
                                     <div class="d-flex align-items-center justify-content-center" style="gap: 15px;">
-                                        <!-- Dosen PA -->
-                                        <div class="text-center">
-                                            @if ($latestPengajuan->approved_at_dosen_pa)
-                                                <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Dosen PA - Approved">
-                                                    <i class="ti ti-check text-white" style="font-size: 10px;"></i>
+                                        @foreach($approvalFlow as $index => $role)
+                                            @php
+                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                                $isLastStep = $index === count($approvalFlow) - 1;
+                                                // Shorten role names for display
+                                                $shortName = match($role) {
+                                                    'dosen_pa' => 'Dosen PA',
+                                                    'kaprodi' => 'Kaprodi',
+                                                    'wadek1' => 'Wadek1',
+                                                    'tu' => 'TU',
+                                                    'bak' => 'BAK',
+                                                    default => substr($roleDisplayName, 0, 8)
+                                                };
+                                            @endphp
+                                            
+                                            <!-- Role Step -->
+                                            <div class="text-center">
+                                                @if($isApproved)
+                                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                        style="width: 20px; height: 20px;" title="{{ $roleDisplayName }} - Approved">
+                                                        <i class="ti ti-check text-white" style="font-size: 10px;"></i>
+                                                    </div>
+                                                @else
+                                                    <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                        style="width: 20px; height: 20px;" title="{{ $roleDisplayName }} - Pending">
+                                                        <i class="ti ti-clock text-white" style="font-size: 10px;"></i>
+                                                    </div>
+                                                @endif
+                                                <div class="mt-1">
+                                                    <small style="font-size: 9px;">{{ $shortName }}</small>
                                                 </div>
-                                            @else
-                                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Dosen PA - Pending">
-                                                    <i class="ti ti-clock text-white" style="font-size: 10px;"></i>
-                                                </div>
-                                            @endif
-                                            <div class="mt-1">
-                                                <small style="font-size: 9px;">Dosen PA</small>
                                             </div>
-                                        </div>
 
-                                        <i class="ti ti-arrow-right text-muted"></i>
-
-                                        <!-- Kaprodi -->
-                                        <div class="text-center">
-                                            @if ($latestPengajuan->approved_at_kaprodi)
-                                                <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Kaprodi - Approved">
-                                                    <i class="ti ti-check text-white" style="font-size: 10px;"></i>
-                                                </div>
-                                            @else
-                                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Kaprodi - Pending">
-                                                    <i class="ti ti-clock text-white" style="font-size: 10px;"></i>
-                                                </div>
+                                            @if(!$isLastStep)
+                                                <i class="ti ti-arrow-right text-muted"></i>
                                             @endif
-                                            <div class="mt-1">
-                                                <small style="font-size: 9px;">Kaprodi</small>
-                                            </div>
-                                        </div>
-
-                                        <i class="ti ti-arrow-right text-muted"></i>
-
-                                        <!-- Wadek1 -->
-                                        <div class="text-center">
-                                            @if ($latestPengajuan->approved_at_wadek1)
-                                                <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Wadek1 - Approved">
-                                                    <i class="ti ti-check text-white" style="font-size: 10px;"></i>
-                                                </div>
-                                            @else
-                                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Wadek1 - Pending">
-                                                    <i class="ti ti-clock text-white" style="font-size: 10px;"></i>
-                                                </div>
-                                            @endif
-                                            <div class="mt-1">
-                                                <small style="font-size: 9px;">Wadek1</small>
-                                            </div>
-                                        </div>
-
-                                        <i class="ti ti-arrow-right text-muted"></i>
-
-                                        <!-- Staff TU -->
-                                        <div class="text-center">
-                                            @if ($latestPengajuan->approved_at_staff_tu)
-                                                <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Staff TU - Completed">
-                                                    <i class="ti ti-check text-white" style="font-size: 10px;"></i>
-                                                </div>
-                                            @else
-                                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 20px; height: 20px;" title="Staff TU - Pending">
-                                                    <i class="ti ti-clock text-white" style="font-size: 10px;"></i>
-                                                </div>
-                                            @endif
-                                            <div class="mt-1">
-                                                <small style="font-size: 9px;">TU</small>
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

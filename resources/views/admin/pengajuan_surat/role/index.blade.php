@@ -127,70 +127,70 @@
 
                                 <!-- Status Timeline Enhanced -->
                                 <div class="mb-3">
+                                    @php
+                                        $approvalFlow = $p->jenisSurat->getApprovalFlow();
+                                        $availableRoles = $p->jenisSurat::getAvailableApprovalRoles();
+                                        $approvalHistory = $p->getApprovalHistory();
+                                        $approvedCount = count(array_filter($approvalHistory, function($item) {
+                                            return isset($item['approved_at']) && $item['approved_at'];
+                                        }));
+                                        $totalSteps = count($approvalFlow);
+                                    @endphp
+
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <small class="text-muted fw-semibold">Progress Persetujuan</small>
-                                        <span class="badge bg-light text-dark">{{ $statusCount }}/4</span>
+                                        <span class="badge bg-light text-dark">{{ $approvedCount }}/{{ $totalSteps }}</span>
                                     </div>
 
                                     <!-- Progress Bar -->
                                     <div class="progress mb-2" style="height: 4px;">
                                         <div class="progress-bar bg-success" role="progressbar"
-                                            style="width: {{ ($statusCount / 4) * 100 }}%"></div>
+                                            style="width: {{ $totalSteps > 0 ? ($approvedCount / $totalSteps) * 100 : 0 }}%"></div>
                                     </div>
 
-                                    <!-- Status Dots -->
+                                    <!-- Dynamic Status Dots -->
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center flex-grow-1">
-                                            <div class="status-step {{ $p->approved_at_dosen_pa ? 'completed' : 'pending' }}"
-                                                title="Dosen PA{{ $p->approved_at_dosen_pa ? ' ✓' : '' }}">
-                                                @if ($p->approved_at_dosen_pa)
-                                                    <i class="bi bi-check2"></i>
-                                                @else
-                                                    <span class="step-number">1</span>
-                                                @endif
-                                            </div>
-                                            <div class="status-connector {{ $p->approved_at_dosen_pa ? 'active' : '' }}">
-                                            </div>
+                                            @foreach($approvalFlow as $index => $role)
+                                                @php
+                                                    $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                    $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                                    $isLastStep = $index === count($approvalFlow) - 1;
+                                                @endphp
 
-                                            <div class="status-step {{ $p->approved_at_kaprodi ? 'completed' : 'pending' }}"
-                                                title="Kaprodi{{ $p->approved_at_kaprodi ? ' ✓' : '' }}">
-                                                @if ($p->approved_at_kaprodi)
-                                                    <i class="bi bi-check2"></i>
-                                                @else
-                                                    <span class="step-number">2</span>
-                                                @endif
-                                            </div>
-                                            <div class="status-connector {{ $p->approved_at_kaprodi ? 'active' : '' }}">
-                                            </div>
+                                                <div class="status-step {{ $isApproved ? 'completed' : 'pending' }}"
+                                                    title="{{ $roleDisplayName }}{{ $isApproved ? ' ✓' : '' }}">
+                                                    @if($isApproved)
+                                                        <i class="bi bi-check2"></i>
+                                                    @else
+                                                        <span class="step-number">{{ $index + 1 }}</span>
+                                                    @endif
+                                                </div>
 
-                                            <div class="status-step {{ $p->approved_at_wadek1 ? 'completed' : 'pending' }}"
-                                                title="Wadek 1{{ $p->approved_at_wadek1 ? ' ✓' : '' }}">
-                                                @if ($p->approved_at_wadek1)
-                                                    <i class="bi bi-check2"></i>
-                                                @else
-                                                    <span class="step-number">3</span>
+                                                @if(!$isLastStep)
+                                                    <div class="status-connector {{ $isApproved ? 'active' : '' }}"></div>
                                                 @endif
-                                            </div>
-                                            <div class="status-connector {{ $p->approved_at_wadek1 ? 'active' : '' }}">
-                                            </div>
-
-                                            <div class="status-step {{ $p->approved_at_staff_tu ? 'completed' : 'pending' }}"
-                                                title="Staff TU{{ $p->approved_at_staff_tu ? ' ✓' : '' }}">
-                                                @if ($p->approved_at_staff_tu)
-                                                    <i class="bi bi-check2"></i>
-                                                @else
-                                                    <span class="step-number">4</span>
-                                                @endif
-                                            </div>
+                                            @endforeach
                                         </div>
                                     </div>
 
-                                    <!-- Labels -->
+                                    <!-- Dynamic Labels -->
                                     <div class="d-flex justify-content-between mt-1">
-                                        <small class="text-muted status-label">PA</small>
-                                        <small class="text-muted status-label">Kaprodi</small>
-                                        <small class="text-muted status-label">Wadek</small>
-                                        <small class="text-muted status-label">TU</small>
+                                        @foreach($approvalFlow as $role)
+                                            @php
+                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                // Shorten role names for display
+                                                $shortName = match($role) {
+                                                    'dosen_pa' => 'PA',
+                                                    'kaprodi' => 'Kaprodi',
+                                                    'wadek1' => 'Wadek',
+                                                    'tu' => 'TU',
+                                                    'bak' => 'BAK',
+                                                    default => substr($roleDisplayName, 0, 6)
+                                                };
+                                            @endphp
+                                            <small class="text-muted status-label">{{ $shortName }}</small>
+                                        @endforeach
                                     </div>
                                 </div>
 
@@ -490,86 +490,42 @@
                                 <div class="card border-0 bg-light">
                                     <div class="card-body p-3">
                                         <h6 class="mb-2"><i class="fas fa-tasks me-1"></i> Status Persetujuan</h6>
+                                        @php
+                                            $approvalFlow = $pengajuan->jenisSurat->getApprovalFlow();
+                                            $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
+                                            $approvalHistory = $pengajuan->getApprovalHistory();
+                                        @endphp
 
-                                        <!-- Dosen PA -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_dosen_pa ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Dosen PA:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->dosenPa->name ?? 'Belum ditentukan' }}</small>
-                                            </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_dosen_pa)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_dosen_pa }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        @foreach($approvalFlow as $index => $role)
+                                            @php
+                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
+                                                $approverName = $approvalHistory[$role]['approver_name'] ?? 'Belum ditentukan';
+                                                $approvedAt = $approvalHistory[$role]['approved_at'] ?? null;
+                                                $isLastStep = $index === count($approvalFlow) - 1;
+                                            @endphp
 
-                                        <!-- Kaprodi -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_kaprodi ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Kaprodi:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->kaprodi->name ?? 'Belum ditentukan' }}</small>
+                                            <!-- Dynamic Role Step -->
+                                            <div class="d-flex justify-content-between align-items-center {{ $isLastStep ? '' : 'mb-2' }} p-2 rounded"
+                                                style="background-color: {{ $isApproved ? '#d4edda' : '#f8d7da' }}">
+                                                <div>
+                                                    <strong>{{ $roleDisplayName }}:</strong><br>
+                                                    <small class="text-muted">{{ $approverName }}</small>
+                                                </div>
+                                                <div>
+                                                    @if($isApproved)
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check me-1"></i>Approved
+                                                        </span>
+                                                        @if($approvedAt)
+                                                            <br><small>{{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}</small>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_kaprodi)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_kaprodi }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Wadek 1 -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_wadek1 ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Wadek 1:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->wadek1->name ?? 'Belum ditentukan' }}</small>
-                                            </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_wadek1)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_wadek1 }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Staff TU -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded"
-                                            style="background-color: {{ $pengajuan->approved_at_staff_tu ? '#d4edda' : '#f8d7da' }}">
-                                            <div>
-                                                <strong>Staff TU:</strong><br>
-                                                <small
-                                                    class="text-muted">{{ $pengajuan->staffTu->name ?? 'Belum ditentukan' }}</small>
-                                            </div>
-                                            <div>
-                                                @if ($pengajuan->approved_at_staff_tu)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Approved
-                                                    </span>
-                                                    <br><small>{{ $pengajuan->approved_at_staff_tu }}</small>
-                                                @else
-                                                    <span class="badge bg-warning">Pending</span>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>

@@ -73,7 +73,7 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-        return $this->hasRole(['admin', 'tu', 'wadek1', 'kaprodi']);
+        return $this->hasRole(['admin', 'tu', 'wadek1', 'kaprodi', 'bak']);
     }
 
     /**
@@ -124,6 +124,16 @@ class User extends Authenticatable
     public function isStaffTU()
     {
         return $this->hasRole('tu');
+    }
+
+    /**
+     * Check if user is staff BAK
+     *
+     * @return bool
+     */
+    public function isStaffBAK()
+    {
+        return $this->hasRole('bak');
     }
 
     /**
@@ -208,6 +218,7 @@ class User extends Authenticatable
             'kaprodi' => 'Kepala Program Studi',
             'wadek1' => 'Wakil Dekan 1',
             'tu' => 'Tata Usaha',
+            'bak' => 'Biro Akademik Kemahasiswaan',
             'dosen_pa' => 'Dosen Pembimbing Akademik'
         ];
 
@@ -228,6 +239,7 @@ class User extends Authenticatable
             'kaprodi' => 'bg-warning',
             'wadek1' => 'bg-secondary',
             'tu' => 'bg-dark',
+            'bak' => 'bg-purple',
             'dosen_pa' => 'bg-info'
         ];
 
@@ -292,5 +304,13 @@ class User extends Authenticatable
     public function pengajuanAsStaffTU()
     {
         return $this->hasMany(PengajuanSurat::class, 'approved_by_staff_tu');
+    }
+
+    /**
+     * Get pengajuan surats where user is staff BAK
+     */
+    public function pengajuanAsStaffBAK()
+    {
+        return $this->hasMany(PengajuanSurat::class, 'approved_by_bak');
     }
 }

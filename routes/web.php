@@ -97,7 +97,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
     Route::post('users/import', [UsersController::class, 'importMahasiswa'])->name('users.import');
     Route::get('users/export', [UsersController::class, 'exportMahasiswa'])->name('users.export');
     Route::get('users/sample', [UsersController::class, 'downloadSample'])->name('users.sample');
-    
+
     Route::resource('users', UsersController::class);
 
     Route::resource('file-approvals', FileApprovalController::class)->except(['create', 'edit', 'show']);
@@ -187,6 +187,7 @@ Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {
     Route::patch('/{id}/approve_wadek1', [PengajuanSuratController::class, 'approveWadek1'])->name('admin.pengajuan.approve_wadek1');
     Route::patch('/{id}/approve_staff_tu', [PengajuanSuratController::class, 'approveStaffTU'])->name('admin.pengajuan.approve_staff_tu');
     Route::patch('/{id}/approve_double', [PengajuanSuratController::class, 'approveDouble'])->name('admin.pengajuan.approve_double');
+    Route::patch('/{id}/approve_bak', [PengajuanSuratController::class, 'approveBAK'])->name('admin.pengajuan.approve_bak');
 
     // Reject by each level (dengan alasan)
     Route::patch('/{id}/reject_dosen_pa', [PengajuanSuratController::class, 'rejectDosenPA'])->name('admin.pengajuan.reject_dosen_pa');
@@ -195,7 +196,7 @@ Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {
     Route::patch('/{id}/reject_staff_tu', [PengajuanSuratController::class, 'rejectStaffTU'])->name('admin.pengajuan.reject_staff_tu');
     Route::patch('/{id}/reject_double', [PengajuanSuratController::class, 'rejectDouble'])->name('admin.pengajuan.reject_double');
     Route::patch('/{id}/reject_bak', [PengajuanSuratController::class, 'rejectBAK'])->name('admin.pengajuan.reject_bak');
-    
+
     // Dynamic approval methods
     Route::patch('/{id}/approve_dynamic', [PengajuanSuratController::class, 'approveDynamic'])->name('admin.pengajuan.approve_dynamic');
     Route::patch('/{id}/reject_dynamic', [PengajuanSuratController::class, 'rejectDynamic'])->name('admin.pengajuan.reject_dynamic');

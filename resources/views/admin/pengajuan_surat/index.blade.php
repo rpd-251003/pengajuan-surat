@@ -193,14 +193,14 @@
                                         $availableRoles = $p->jenisSurat::getAvailableApprovalRoles();
                                         $approvalHistory = $p->getApprovalHistory();
                                     @endphp
-                                    
+
                                     @foreach($approvalFlow as $index => $role)
                                         @php
                                             $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
                                             $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
                                             $isLastStep = $index === count($approvalFlow) - 1;
                                         @endphp
-                                        
+
                                         <div class="d-flex align-items-center {{ $isLastStep ? '' : 'mb-2' }}">
                                             <div class="timeline-icon me-2">
                                                 @if($isApproved)
@@ -261,10 +261,10 @@
                                     @endif
                                 </div>
 
-                                @if ($role == 'wadek1')
-                                    @if (is_null($p->approved_by_wadek1))
+                                @if ($role == 'bak')
+                                    @if (is_null($p->approved_by_bak))
                                         <form method="POST"
-                                            action="{{ route('admin.pengajuan.approve_wadek1', $p->id) }}"
+                                            action="{{ route('admin.pengajuan.approve_bak', $p->id) }}"
                                             class="d-inline">
                                             @csrf @method('PATCH')
                                             <button type="submit" class="btn btn-sm btn-success me-1"
@@ -276,7 +276,7 @@
 
                                     <button type="button" class="btn btn-sm btn-danger btn-reject"
                                         data-bs-toggle="modal" data-bs-target="#rejectModal"
-                                        data-id="{{ $p->id }}" data-level="wadek1">
+                                        data-id="{{ $p->id }}" data-level="bak">
                                         <i class="fas fa-times me-1"></i> Reject
                                     </button>
                                 @elseif($role == 'tu')
@@ -631,7 +631,7 @@
                                             $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
                                             $approvalHistory = $pengajuan->getApprovalHistory();
                                         @endphp
-                                        
+
                                         @foreach($approvalFlow as $index => $role)
                                             @php
                                                 $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
@@ -640,7 +640,7 @@
                                                 $approvedAt = $approvalHistory[$role]['approved_at'] ?? null;
                                                 $isLastStep = $index === count($approvalFlow) - 1;
                                             @endphp
-                                            
+
                                             <!-- Dynamic Role Step -->
                                             <div class="d-flex justify-content-between align-items-center {{ $isLastStep ? '' : 'mb-2' }} p-2 rounded"
                                                 style="background-color: {{ $isApproved ? '#d4edda' : '#f8d7da' }}">

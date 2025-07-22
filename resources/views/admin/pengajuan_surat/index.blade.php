@@ -261,10 +261,10 @@
                                     @endif
                                 </div>
 
-                                @if ($role == 'bak')
+                                @if ($role == 'tu')
                                     @if (is_null($p->approved_by_bak))
                                         <form method="POST"
-                                            action="{{ route('admin.pengajuan.approve_bak', $p->id) }}"
+                                            action="{{ route('admin.pengajuan.approve_staff_tu', $p->id) }}"
                                             class="d-inline">
                                             @csrf @method('PATCH')
                                             <button type="submit" class="btn btn-sm btn-success me-1"
@@ -276,12 +276,12 @@
 
                                     <button type="button" class="btn btn-sm btn-danger btn-reject"
                                         data-bs-toggle="modal" data-bs-target="#rejectModal"
-                                        data-id="{{ $p->id }}" data-level="bak">
+                                        data-id="{{ $p->id }}" data-level="staff_tu">
                                         <i class="fas fa-times me-1"></i> Reject
                                     </button>
-                                @elseif($role == 'tu')
+                                @elseif($role == 'bak')
                                     {{-- Tombol Approve --}}
-                                    <form method="POST" action="{{ route('admin.pengajuan.approve_staff_tu', $p->id) }}"
+                                    <form method="POST" action="{{ route('admin.pengajuan.approve_bak', $p->id) }}"
                                         class="d-inline">
                                         @csrf
                                         @method('PATCH')
@@ -294,7 +294,7 @@
                                     {{-- Tombol Reject --}}
                                     <button type="button" class="btn btn-sm btn-danger btn-reject"
                                         data-bs-toggle="modal" data-bs-target="#rejectModal"
-                                        data-id="{{ $p->id }}" data-level="staff_tu">
+                                        data-id="{{ $p->id }}" data-level="bak">
                                         <i class="fas fa-times me-1"></i> Reject
                                     </button>
 

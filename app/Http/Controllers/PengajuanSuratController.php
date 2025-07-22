@@ -423,7 +423,7 @@ class PengajuanSuratController extends Controller
                 }
 
                 // Parse current_approval_flow (pastikan di DB bertipe JSON string)
-                $currentFlow = json_decode($pengajuan->current_approval_flow, true);
+                $currentFlow = $pengajuan->current_approval_flow;
 
                 // Jika tidak mengandung dosen_pa atau kaprodi → langsung skip
                 if (!in_array('dosen_pa', $currentFlow) && !in_array('kaprodi', $currentFlow)) {

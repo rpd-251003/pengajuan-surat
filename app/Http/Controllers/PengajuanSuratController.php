@@ -410,74 +410,83 @@ class PengajuanSuratController extends Controller
     }
 
     public function index_dosen()
-{
-    $user = Auth::user();
-    $login_id = $user->id;
+    {
+        $user = Auth::user();
+        $login_id = $user->id;
 
-    $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])
-        ->orderBy('id', 'desc')
-        ->get()
-        ->filter(function ($pengajuan) use ($user, $login_id) {
-            if (!$pengajuan->jenisSurat) {
+        $pengajuanSurats = PengajuanSurat::with(['mahasiswa.user', 'jenisSurat'])
+            ->orderBy('id', 'desc')
+            ->get()
+            ->filter(function ($pengajuan) use ($user, $login_id) {
+                if (!$pengajuan->jenisSurat) {
+                    return false;
+                }
+
+                // Parse current_approval_flow (pastikan di DB bertipe JSON string)
+                $currentFlow = json_decode($pengajuan->current_approval_flow, true);
+
+                // Jika tidak mengandung dosen_pa atau kaprodi → langsung skip
+                if (!in_array('dosen_pa', $currentFlow) && !in_array('kaprodi', $currentFlow)) {
+                    return false;
+                }
+
+
+                // CEK APAKAH DIA APPROVER AKTIF
+                if (
+                    !$pengajuan->approved_by_dosen_pa &&
+                    $user->canApproveAsDosenPA($pengajuan->tahun_angkatan, $pengajuan->prodi_id)
+                ) {
+                    return true;
+                }
+
+                if (
+                    $pengajuan->approved_by_dosen_pa && // Sudah approved oleh dosen_pa
+                    !$pengajuan->approved_by_kaprodi &&
+                    $user->canApproveAsKaprodi($pengajuan->tahun_angkatan, $pengajuan->prodi_id)
+                ) {
+                    return true;
+                }
+
+                if (
+                    $pengajuan->approved_by_kaprodi &&
+                    !$pengajuan->approved_by_wadek1 &&
+                    $user->hasRole('wadek1')
+                ) {
+                    return true;
+                }
+
+                if (
+                    $pengajuan->approved_by_wadek1 &&
+                    !$pengajuan->approved_by_staff_tu &&
+                    $user->hasRole('tu')
+                ) {
+                    return true;
+                }
+
+                if (
+                    $pengajuan->approved_by_staff_tu &&
+                    !$pengajuan->approved_by_bak &&
+                    $user->hasRole('bak')
+                ) {
+                    return true;
+                }
+
+                // CEK APAKAH DIA MEMANG YANG SUDAH APPROVE (HISTORI)
+                if (
+                    $pengajuan->approved_by_dosen_pa == $login_id ||
+                    $pengajuan->approved_by_kaprodi == $login_id ||
+                    $pengajuan->approved_by_wadek1 == $login_id ||
+                    $pengajuan->approved_by_staff_tu == $login_id ||
+                    $pengajuan->approved_by_bak == $login_id
+                ) {
+                    return true;
+                }
+
                 return false;
-            }
+            });
 
-            // CEK APAKAH DIA APPROVER AKTIF
-            if (
-                !$pengajuan->approved_by_dosen_pa &&
-                $user->canApproveAsDosenPA($pengajuan->tahun_angkatan, $pengajuan->prodi_id)
-            ) {
-                return true;
-            }
-
-            if (
-                $pengajuan->approved_by_dosen_pa && // Sudah approved oleh dosen_pa
-                !$pengajuan->approved_by_kaprodi &&
-                $user->canApproveAsKaprodi($pengajuan->tahun_angkatan, $pengajuan->prodi_id)
-            ) {
-                return true;
-            }
-
-            if (
-                $pengajuan->approved_by_kaprodi &&
-                !$pengajuan->approved_by_wadek1 &&
-                $user->hasRole('wadek1')
-            ) {
-                return true;
-            }
-
-            if (
-                $pengajuan->approved_by_wadek1 &&
-                !$pengajuan->approved_by_staff_tu &&
-                $user->hasRole('tu')
-            ) {
-                return true;
-            }
-
-            if (
-                $pengajuan->approved_by_staff_tu &&
-                !$pengajuan->approved_by_bak &&
-                $user->hasRole('bak')
-            ) {
-                return true;
-            }
-
-            // CEK APAKAH DIA MEMANG YANG SUDAH APPROVE (HISTORI)
-            if (
-                $pengajuan->approved_by_dosen_pa == $login_id ||
-                $pengajuan->approved_by_kaprodi == $login_id ||
-                $pengajuan->approved_by_wadek1 == $login_id ||
-                $pengajuan->approved_by_staff_tu == $login_id ||
-                $pengajuan->approved_by_bak == $login_id
-            ) {
-                return true;
-            }
-
-            return false;
-        });
-
-    return view('admin.pengajuan_surat.role.index', compact('pengajuanSurats'));
-}
+        return view('admin.pengajuan_surat.role.index', compact('pengajuanSurats'));
+    }
 
 
 

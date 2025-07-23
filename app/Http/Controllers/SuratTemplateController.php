@@ -181,15 +181,18 @@ class SuratTemplateController extends Controller
         $sampleData['nomor_surat'] = '001/ABC/VII/2025';
 
         $content = $template->generateContent($sampleData);
+        
+        // Add static header (kop surat) like in PDF generator
+        $staticHeader = $this->getStaticHeader();
 
         // If AJAX request, return HTML content only
         if ($request->ajax()) {
-            $html = view('template.preview-content', compact('template', 'content'))->render();
+            $html = view('template.preview-content', compact('template', 'content', 'staticHeader'))->render();
             return response($html);
         }
 
         // If regular request, return full page
-        return view('template.preview', compact('template', 'content'));
+        return view('template.preview', compact('template', 'content', 'staticHeader'));
     }
 
     private function generateSampleValue($field)
@@ -233,5 +236,35 @@ class SuratTemplateController extends Controller
                                  ->where('is_active', true)
                                  ->get();
         return response()->json($templates);
+    }
+
+    /**
+     * Get static header (kop surat) from Universitas Darma Persada
+     * Same as used in PDF generator
+     */
+    private function getStaticHeader()
+    {
+        return '
+    <div style="clear:both;">
+        <p style="margin-top:6pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:24pt;">
+            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65537;">
+                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="Logo" style="margin: 0 0 0 auto; display: block;">
+            </span>
+            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65534;">
+                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="" style="margin: 0 0 0 auto; display: block;">
+            </span>
+            <strong><span style="font-family:\'Times New Roman\';">UNIVERSITAS DARMA PERSADA</span></strong>
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            Jl. Taman Malaka Selatan Pondok Kelapa Jakarta 13450
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            Telp. 021 – 8649051, 8649053, 8649057 Fax. (021) 8649052
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            E-mail: humas@unsada.ac.id Home page: http://www.unsada.ac.id
+        </p>
+        <hr style="border: 1px solid #000; margin: 30px 0;">
+    </div>';
     }
 }

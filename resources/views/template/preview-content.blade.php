@@ -51,6 +51,9 @@
     </style>
     
     <div class="preview-content">
+        <!-- Kop Surat Universitas Darma Persada -->
+        {!! $staticHeader !!}
+        
         @if($template->header_image)
             <div style="text-align: center; margin-bottom: 20px;">
                 <img src="{{ asset('storage/' . $template->header_image) }}" 

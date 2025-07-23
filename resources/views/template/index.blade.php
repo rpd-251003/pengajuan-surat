@@ -30,7 +30,7 @@
 
     <!-- Preview Modal -->
     <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-a4">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="previewModalLabel">Preview Template</h5>
@@ -218,14 +218,43 @@
             }
         }
 
-        .modal-xl {
-            max-width: 95%;
+        /* A4 Paper Modal */
+        .modal-a4 {
+            max-width: 210mm;
+            max-width: calc(210mm + 40px); /* Add padding for scrollbar */
+        }
+        
+        .modal-a4 .modal-dialog {
+            margin: 30px auto;
         }
 
         #previewContent {
             border: 1px solid #ddd;
-            padding: 20px;
+            padding: 0;
             background: white;
+            width: 210mm; /* A4 width */
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+        
+        /* Responsive for smaller screens */
+        @media (max-width: 768px) {
+            .modal-a4 {
+                max-width: 95%;
+            }
+            
+            #previewContent {
+                width: 100%;
+                transform: scale(0.7);
+                transform-origin: top center;
+            }
         }
     </style>
 @endpush

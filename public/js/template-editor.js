@@ -264,11 +264,11 @@
             const selectedOption = $('#jenis_surat_id').find('option:selected');
             const fields = selectedOption.data('fields');
 
-            // if (fields) {
-            //     fields.forEach(function(field) {
-            //         sampleData[field.field_name] = getSampleValue(field);
-            //     });
-            // }
+            if (fields) {
+                fields.forEach(function(field) {
+                    sampleData[field.field_name] = getSampleValue(field);
+                });
+            }
 
             // Replace placeholders
             let previewContent = templateContent;

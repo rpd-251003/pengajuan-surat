@@ -195,12 +195,26 @@ class SuratTemplateController extends Controller
             case 'number':
                 return '12345';
             case 'select':
+            case 'radio':
                 $options = $field->field_options;
-                return is_array($options) && !empty($options) ? $options[0] : 'Sample Option';
+                if (is_array($options) && !empty($options)) {
+                    // Get first value from associative array
+                    return array_values($options)[0];
+                }
+                return 'Sample Option';
+            case 'checkbox':
+                $options = $field->field_options;
+                if (is_array($options) && !empty($options)) {
+                    // For checkbox, return first option value (checked)
+                    return array_values($options)[0];
+                }
+                return 'Yes';
             case 'textarea':
                 return 'Ini adalah contoh teks panjang untuk field ' . $field->field_label;
             case 'date':
                 return now()->format('Y-m-d');
+            case 'file':
+                return 'sample-file.pdf';
             default:
                 return 'Sample Value';
         }

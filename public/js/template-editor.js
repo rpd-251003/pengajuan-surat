@@ -264,11 +264,11 @@
             const selectedOption = $('#jenis_surat_id').find('option:selected');
             const fields = selectedOption.data('fields');
 
-            if (fields) {
-                fields.forEach(function(field) {
-                    sampleData[field.field_name] = getSampleValue(field);
-                });
-            }
+            // if (fields) {
+            //     fields.forEach(function(field) {
+            //         sampleData[field.field_name] = getSampleValue(field);
+            //     });
+            // }
 
             // Replace placeholders
             let previewContent = templateContent;
@@ -285,34 +285,6 @@
             $('#previewContent').html(previewContent);
             $('#previewModal').modal('show');
         }
-
-        function getSampleValue(field) {
-    if (!field || !field.field_type) return 'Invalid Field';
-
-    switch (field.field_type) {
-        case 'text':
-            return 'Sample ' + (field.field_label || 'Text');
-        case 'email':
-            return 'sample@example.com';
-        case 'number':
-            return '12345';
-        case 'select':
-            if (field.field_options && field.field_options.length > 0) {
-                const firstOption = field.field_options[0];
-                return typeof firstOption === 'string'
-                    ? firstOption
-                    : firstOption?.value || 'Sample Option';
-            }
-            return 'Sample Option';
-        case 'textarea':
-            return 'Ini adalah contoh teks panjang untuk field ' + (field.field_label || '');
-        case 'date':
-            return new Date().toISOString().split('T')[0];
-        default:
-            return 'Sample Value';
-    }
-}
-
 
         function printPreview() {
             const printContent = document.getElementById('previewContent').innerHTML;

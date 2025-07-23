@@ -287,25 +287,32 @@
         }
 
         function getSampleValue(field) {
-            switch (field.field_type) {
-                case 'text':
-                    return 'Sample ' + field.field_label;
-                case 'email':
-                    return 'sample@example.com';
-                case 'number':
-                    return '12345';
-                case 'select':
-                    return field.field_options && field.field_options.length > 0 ?
-                        field.field_options[0] :
-                        'Sample Option';
-                case 'textarea':
-                    return 'Ini adalah contoh teks panjang untuk field ' + field.field_label;
-                case 'date':
-                    return new Date().toISOString().split('T')[0];
-                default:
-                    return 'Sample Value';
+    if (!field || !field.field_type) return 'Invalid Field';
+
+    switch (field.field_type) {
+        case 'text':
+            return 'Sample ' + (field.field_label || 'Text');
+        case 'email':
+            return 'sample@example.com';
+        case 'number':
+            return '12345';
+        case 'select':
+            if (field.field_options && field.field_options.length > 0) {
+                const firstOption = field.field_options[0];
+                return typeof firstOption === 'string'
+                    ? firstOption
+                    : firstOption?.value || 'Sample Option';
             }
-        }
+            return 'Sample Option';
+        case 'textarea':
+            return 'Ini adalah contoh teks panjang untuk field ' + (field.field_label || '');
+        case 'date':
+            return new Date().toISOString().split('T')[0];
+        default:
+            return 'Sample Value';
+    }
+}
+
 
         function printPreview() {
             const printContent = document.getElementById('previewContent').innerHTML;

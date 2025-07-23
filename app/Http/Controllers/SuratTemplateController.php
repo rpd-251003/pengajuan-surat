@@ -254,17 +254,17 @@ class SuratTemplateController extends Controller
         </div>
         
         <!-- University Name and Details -->
-        <div style="margin-left: 0; padding-top: 10px;">
+        <div style="margin-left: 0; padding-top: 10px; text-align: center;">
             <h1 style="font-family: \'Times New Roman\', serif; font-size: 24pt; font-weight: bold; margin: 0; color: #000;">
                 UNIVERSITAS DARMA PERSADA
             </h1>
-            <p style="margin: 5px 0; font-size: 12pt; line-height: 1.4;">
+            <p style="margin: 5px 0; font-size: 12pt; line-height: 1.4; text-align: center;">
                 Jl. Taman Malaka Selatan Pondok Kelapa Jakarta 13450
             </p>
-            <p style="margin: 5px 0; font-size: 12pt; line-height: 1.4;">
+            <p style="margin: 5px 0; font-size: 12pt; line-height: 1.4; text-align: center;">
                 Telp. 021 – 8649051, 8649053, 8649057 Fax. (021) 8649052
             </p>
-            <p style="margin: 5px 0 20px 0; font-size: 12pt; line-height: 1.4;">
+            <p style="margin: 5px 0 20px 0; font-size: 12pt; line-height: 1.4; text-align: center;">
                 E-mail: humas@unsada.ac.id Home page: http://www.unsada.ac.id
             </p>
         </div>

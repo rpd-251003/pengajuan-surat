@@ -268,8 +268,8 @@
                                             class="d-inline">
                                             @csrf @method('PATCH')
                                             <button type="submit" class="btn btn-sm btn-success me-1"
-                                                onclick="return confirm('Yakin approve?')">
-                                                <i class="fas fa-check me-1"></i> Approve
+                                                onclick="return confirm('Yakin Setujui?')">
+                                                <i class="fas fa-check me-1"></i> Setujui
                                             </button>
                                         </form>
                                     @endif
@@ -277,7 +277,25 @@
                                     <button type="button" class="btn btn-sm btn-danger btn-reject"
                                         data-bs-toggle="modal" data-bs-target="#rejectModal"
                                         data-id="{{ $p->id }}" data-level="staff_tu">
-                                        <i class="fas fa-times me-1"></i> Reject
+                                        <i class="fas fa-times me-1"></i> Tolak
+                                    </button>
+                                @elseif($role == 'wadek1')
+                                    @if (is_null($p->approved_by_bak))
+                                        <form method="POST"
+                                            action="{{ route('admin.pengajuan.approve_wadek1', $p->id) }}"
+                                            class="d-inline">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="btn btn-sm btn-success me-1"
+                                                onclick="return confirm('Yakin Setujui?')">
+                                                <i class="fas fa-check me-1"></i> Setujui
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <button type="button" class="btn btn-sm btn-danger btn-reject"
+                                        data-bs-toggle="modal" data-bs-target="#rejectModal"
+                                        data-id="{{ $p->id }}" data-level="wadek1">
+                                        <i class="fas fa-times me-1"></i> Tolak
                                     </button>
                                 @elseif($role == 'bak')
                                     {{-- Tombol Approve --}}
@@ -286,8 +304,8 @@
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn btn-sm btn-success me-1"
-                                            onclick="return confirm('Yakin approve?')">
-                                            <i class="fas fa-check me-1"></i> Approve
+                                            onclick="return confirm('Yakin Setujui?')">
+                                            <i class="fas fa-check me-1"></i> Setujui
                                         </button>
                                     </form>
 
@@ -295,7 +313,7 @@
                                     <button type="button" class="btn btn-sm btn-danger btn-reject"
                                         data-bs-toggle="modal" data-bs-target="#rejectModal"
                                         data-id="{{ $p->id }}" data-level="bak">
-                                        <i class="fas fa-times me-1"></i> Reject
+                                        <i class="fas fa-times me-1"></i> Tolak
                                     </button>
 
                                     {{-- Tombol Upload Surat --}}

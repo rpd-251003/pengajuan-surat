@@ -37,8 +37,7 @@
                 <select class="form-select" id="role" name="role" required>
                     <option value="">Pilih Role</option>
                     <option value="mahasiswa">Mahasiswa</option>
-                    <option value="dosen">Dosen</option>
-                    <option value="kaprodi">Kaprodi</option>
+                    <option value="dosen">Dosen / Kaprodi</option>
                     <option value="wadek1">Wadek 1</option>
                     <option value="tu">TU</option>
                     <option value="bak">BAK</option>

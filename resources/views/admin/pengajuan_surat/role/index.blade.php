@@ -125,6 +125,19 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted">Dosen PA:</small><br>
+                                            <small class="fw-bold">{{ $p->dosenPA->name ?? 'Belum ditentukan' }}</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Kaprodi:</small><br>
+                                            <small class="fw-bold">{{ $p->kaprodi->name ?? 'Belum ditentukan' }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Status Timeline Enhanced -->
                                 <div class="mb-3">
                                     @php
@@ -263,7 +276,7 @@
                                         {{-- Sudah diapprove oleh kedua role --}}
                                         <div class="text-center w-100">
                                             <span class="badge bg-success">
-                                                <i class="bi bi-check-circle me-1"></i>Approved Already
+                                                <i class="bi bi-check-circle me-1"></i>Telah Disetujui
                                             </span>
                                         </div>
                                     @elseif($p->approved_by_kaprodi == $id_user && $p->approved_by_dosen_pa == $id_user)
@@ -275,7 +288,7 @@
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold"
                                                 onclick="return confirm('Yakin approve sebagai Kaprodi & Dosen PA?')">
-                                                <i class="bi bi-check-lg me-1"></i>Approve as Kaprodi & Dosen PA
+                                                <i class="bi bi-check-lg me-1"></i>Setujui Sebagai Kaprodi & Dosen PA
                                             </button>
                                         </form>
                                         <button type="button" class="btn btn-outline-danger btn-sm btn-reject ms-2"
@@ -292,7 +305,7 @@
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold"
                                                 onclick="return confirm('Yakin approve sebagai Kaprodi?')">
-                                                <i class="bi bi-check-lg me-1"></i>Approve as Kaprodi
+                                                <i class="bi bi-check-lg me-1"></i>Setujui Sebagai Kaprodi
                                             </button>
                                         </form>
                                         <button type="button" class="btn btn-outline-danger btn-sm btn-reject ms-2"
@@ -309,7 +322,7 @@
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold"
                                                 onclick="return confirm('Yakin approve sebagai Dosen PA?')">
-                                                <i class="bi bi-check-lg me-1"></i>Approve as Dosen PA
+                                                <i class="bi bi-check-lg me-1"></i>Setujui Sebagai Dosen PA
                                             </button>
                                         </form>
                                         <button type="button" class="btn btn-outline-danger btn-sm btn-reject ms-2"
@@ -321,14 +334,14 @@
                                         {{-- Kaprodi sudah approve --}}
                                         <div class="text-center w-100">
                                             <span class="badge bg-secondary">
-                                                <i class="bi bi-check-circle me-1"></i>Approved as Kaprodi
+                                                <i class="bi bi-check-circle me-1"></i>Telah Disetujui Kaprodi
                                             </span>
                                         </div>
                                     @elseif($p->approved_by_dosen_pa == $id_user && $p->approved_at_dosen_pa != null)
                                         {{-- Dosen PA sudah approve --}}
                                         <div class="text-center w-100">
                                             <span class="badge bg-secondary">
-                                                <i class="bi bi-check-circle me-1"></i>Approved as Dosen PA
+                                                <i class="bi bi-check-circle me-1"></i>Telah Disetujui Dosen PA
                                             </span>
                                         </div>
                                     @else

@@ -193,11 +193,11 @@ class PDFGeneratorController extends Controller
         // Base data
         $data = [
             'tanggal_surat' => now()->format('d F Y'),
-            'nomor_surat' => $pengajuan->fileApproval->nomor_surat,
+            'nomor_surat' => $pengajuan->fileApproval->nomor_surat ?? 'Belum Ditentukan',
             'nama_mahasiswa' => $pengajuan->mahasiswa->user->name,
             'nim' => $pengajuan->mahasiswa->nim,
-            'prodi' => $pengajuan->prodi_id, // You might want to get this from a relation
-            'fakultas' => $pengajuan->fakultas_id, // You might want to get this from a relation
+            'prodi' => $pengajuan->prodi->nama ?? 'Belum Ditentukan',
+            'fakultas' => $pengajuan->fakultas->nama ?? 'Belum Ditentukan',
             'tahun_angkatan' => $pengajuan->tahun_angkatan,
             'nama_jenis_surat' => $pengajuan->jenisSurat->nama,
             'keterangan' => $pengajuan->keterangan,

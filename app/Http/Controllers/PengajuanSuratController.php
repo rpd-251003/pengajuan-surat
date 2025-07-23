@@ -395,6 +395,10 @@ class PengajuanSuratController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        $role = Auth::user()->role;
+
+        // Pastikan hanya ambil data yang sesuai dengan role yang sedang login
+        $query->whereJsonContains('current_approval_flow', $role);
 
         $pengajuanSurats = $query->orderBy('created_at', 'desc')->paginate(5);
 

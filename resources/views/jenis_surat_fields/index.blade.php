@@ -182,7 +182,7 @@
 
         $('body').on('click', '.edit', function () {
             let id = $(this).data('id');
-            $.get("{{ url('jenis-surat-fields') }}/" + id, function (data) {
+            $.get("{{ url('jenis-surat-fields') }}/" + id + "/show", function (data) {
                 $('#fieldModalLabel').html("Edit Field");
                 $('#saveBtn').val("edit-field");
                 $('#fieldModal').modal('show');

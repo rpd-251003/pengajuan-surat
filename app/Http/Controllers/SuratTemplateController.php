@@ -245,26 +245,32 @@ class SuratTemplateController extends Controller
     private function getStaticHeader()
     {
         return '
-    <div style="clear:both;">
-        <p style="margin-top:6pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:24pt;">
-            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65537;">
-                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="Logo" style="margin: 0 0 0 auto; display: block;">
-            </span>
-            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65534;">
-                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="" style="margin: 0 0 0 auto; display: block;">
-            </span>
-            <strong><span style="font-family:\'Times New Roman\';">UNIVERSITAS DARMA PERSADA</span></strong>
-        </p>
-        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
-            Jl. Taman Malaka Selatan Pondok Kelapa Jakarta 13450
-        </p>
-        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
-            Telp. 021 – 8649051, 8649053, 8649057 Fax. (021) 8649052
-        </p>
-        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
-            E-mail: humas@unsada.ac.id Home page: http://www.unsada.ac.id
-        </p>
-        <hr style="border: 1px solid #000; margin: 30px 0;">
+    <!-- Kop Surat Universitas Darma Persada -->
+    <div style="position: relative; text-align: center; margin-bottom: 30px;">
+        <!-- Logo -->
+        <div style="position: absolute; left: 50px; top: 10px;">
+            <img src="https://r-code.online/img/unsada-logo.png" width="100" height="100" alt="Logo UNSADA"
+                 style="display: block;">
+        </div>
+        
+        <!-- University Name and Details -->
+        <div style="margin-left: 0; padding-top: 10px;">
+            <h1 style="font-family: \'Times New Roman\', serif; font-size: 24pt; font-weight: bold; margin: 0; color: #000;">
+                UNIVERSITAS DARMA PERSADA
+            </h1>
+            <p style="margin: 5px 0; font-size: 12pt; line-height: 1.4;">
+                Jl. Taman Malaka Selatan Pondok Kelapa Jakarta 13450
+            </p>
+            <p style="margin: 5px 0; font-size: 12pt; line-height: 1.4;">
+                Telp. 021 – 8649051, 8649053, 8649057 Fax. (021) 8649052
+            </p>
+            <p style="margin: 5px 0 20px 0; font-size: 12pt; line-height: 1.4;">
+                E-mail: humas@unsada.ac.id Home page: http://www.unsada.ac.id
+            </p>
+        </div>
+        
+        <!-- Separator Line -->
+        <hr style="border: 0; border-top: 2px solid #000; margin: 20px 0; clear: both;">
     </div>';
     }
 }

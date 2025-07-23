@@ -105,6 +105,11 @@
         </div>
 
         <div class="content-wrapper">
+            <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://r-code.online/img/unsada-logo.png"
+                         alt="Header"
+                         width="120" height="120">
+                </div>
             <!-- Kop Surat Universitas Darma Persada -->
             {!! $staticHeader !!}
 

@@ -166,7 +166,7 @@ class SuratTemplateController extends Controller
         return response()->json(['success' => 'Status template berhasil diubah']);
     }
 
-    public function preview($id)
+    public function preview(Request $request, $id)
     {
         $template = SuratTemplate::with(['jenisSurat', 'jenisSurat.fields'])->findOrFail($id);
 
@@ -182,6 +182,13 @@ class SuratTemplateController extends Controller
 
         $content = $template->generateContent($sampleData);
 
+        // If AJAX request, return HTML content only
+        if ($request->ajax()) {
+            $html = view('template.preview-content', compact('template', 'content'))->render();
+            return response($html);
+        }
+
+        // If regular request, return full page
         return view('template.preview', compact('template', 'content'));
     }
 

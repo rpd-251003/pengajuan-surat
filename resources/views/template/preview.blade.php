@@ -111,15 +111,27 @@
                          width="120" height="120">
                 </div>
             <!-- Kop Surat Universitas Darma Persada -->
-            {!! $staticHeader !!}
-
-            @if($template->header_image)
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="https://r-code.online/img/unsada-logo.png"
-                         alt="Header"
-                         width="120" height="120">
-                </div>
-            @endif
+            <div style="clear:both;">
+        <p style="margin-top:6pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:24pt;">
+            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65537;">
+                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="Logo" style="margin: 0 0 0 auto; display: block;">
+            </span>
+            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65534;">
+                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="" style="margin: 0 0 0 auto; display: block;">
+            </span>
+            <strong><span style="font-family:\'Times New Roman\';">UNIVERSITAS DARMA PERSADA</span></strong>
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            Jl. Taman Malaka Selatan Pondok Kelapa Jakarta 13450
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            Telp. 021 – 8649051, 8649053, 8649057 Fax. (021) 8649052
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            E-mail: humas@unsada.ac.id Home page: http://www.unsada.ac.id
+        </p>
+        <hr style="border: 1px solid #000; margin: 30px 0;">
+    </div>
 
             {!! $content !!}
 

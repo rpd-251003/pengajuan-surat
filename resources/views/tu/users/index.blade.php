@@ -304,8 +304,9 @@
 
         // Download Sample
         function downloadSample() {
-            window.location.href = "{{ route('users.sample') }}";
-        }
+    window.location.href = "{{ asset('template_import.xlsx') }}";
+}
+
 
         // Handle Import Form
         $(document).on('submit', '#importForm', function(e) {

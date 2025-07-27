@@ -33,7 +33,7 @@ class MahasiswaImport implements ToCollection, WithHeadingRow, WithValidation
             // Create user
             $user = User::create([
                 'name' => $nama,
-                'email' => $nim . '@student.example.com', // Generate email from NIM
+                'email' => $nim . '@unsada.ac.id', // Generate email from NIM
                 'nomor_identifikasi' => $nim,
                 'password' => Hash::make($password),
                 'role' => 'mahasiswa',
@@ -51,9 +51,9 @@ class MahasiswaImport implements ToCollection, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            '*.nim' => 'required|string|unique:users,nomor_identifikasi',
-            '*.nama' => 'required|string|max:255',
-            '*.password' => 'required|string|min:6'
+            '*.nim' => 'required|unique:users,nomor_identifikasi',
+            '*.nama' => 'required|max:255',
+            '*.password' => 'required|min:6'
         ];
     }
 

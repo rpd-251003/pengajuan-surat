@@ -100,9 +100,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':tu'])->group(function () {
 
     Route::resource('users', UsersController::class);
 
-    Route::resource('file-approvals', FileApprovalController::class)->except(['create', 'edit', 'show']);
-    Route::get('/file-approvals/data', [FileApprovalController::class, 'data'])->name('file-approvals.data');
-
     Route::prefix('jenis-surat-fields')->group(function () {
         Route::get('/{jenisSuratId}', [JenisSuratFieldController::class, 'index'])->name('jenis-surat-fields.index');
         Route::post('/', [JenisSuratFieldController::class, 'store'])->name('jenis-surat-fields.store');
@@ -180,6 +177,9 @@ Route::middleware('auth')->group(function () {
 Route::prefix('data/pengajuan')->middleware(['auth'])->group(function () {
     Route::get('/', [PengajuanSuratController::class, 'index'])->name('admin.pengajuan.index');
     Route::get('/dosen', [PengajuanSuratController::class, 'index_dosen'])->name('admin.pengajuan.dosen');
+    
+    Route::resource('file-approvals', FileApprovalController::class)->except(['create', 'edit', 'show']);
+    Route::get('/file-approvals/data', [FileApprovalController::class, 'data'])->name('file-approvals.data');
 
     // Approve by each level
     Route::patch('/{id}/approve_dosen_pa', [PengajuanSuratController::class, 'approveDosenPA'])->name('admin.pengajuan.approve_dosen_pa');

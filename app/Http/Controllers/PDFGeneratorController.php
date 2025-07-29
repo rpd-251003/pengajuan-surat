@@ -191,6 +191,20 @@ class PDFGeneratorController extends Controller
     private function prepareTemplateData($pengajuan)
     {
         // Base data
+        
+        \Log::debug('Data pengajuan yang diterima:', [
+        'fileApproval' => $pengajuan->fileApproval,
+        'nomor_surat' => $pengajuan->fileApproval->nomor_surat ?? null,
+        'mahasiswa_user' => optional($pengajuan->mahasiswa)->user,
+        'nim' => optional($pengajuan->mahasiswa)->nim,
+        'prodi' => $pengajuan->prodi,
+        'fakultas' => $pengajuan->fakultas,
+        'tahun_angkatan' => $pengajuan->tahun_angkatan,
+        'jenis_surat' => $pengajuan->jenisSurat,
+        'keterangan' => $pengajuan->keterangan,
+    ]);
+
+
         $data = [
             'tanggal_surat' => now()->format('d F Y'),
             'nomor_surat' => $pengajuan->fileApproval->nomor_surat ?? 'Belum Ditentukan',

@@ -6,6 +6,8 @@ use App\Models\FileApproval;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
+
 
 class FileApprovalController extends Controller
 {
@@ -46,22 +48,46 @@ class FileApprovalController extends Controller
         return view('file_approvals.index', compact('fileApprovals', 'pengajuans'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'id_pengajuan' => 'required|exists:pengajuan_surats,id',
-            'nomor_surat' => 'required',
-            'file_surat' => 'required|file|mimes:pdf,doc,docx'
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'id_pengajuan' => 'required|exists:pengajuan_surats,id',
+        'nomor_surat' => 'required',
+    ]);
+
+    // Cek apakah fileApproval untuk pengajuan ini sudah ada
+    $fileApproval = FileApproval::where('id_pengajuan', $validated['id_pengajuan'])->first();
+
+    if ($fileApproval) {
+        // Jika sudah ada, update nomor_surat saja
+        $fileApproval->update([
+            'nomor_surat' => $validated['nomor_surat'],
         ]);
-
-        if ($request->hasFile('file_surat')) {
-            $filename = $request->file('file_surat')->store('files', 'public');
-            $validated['file_surat'] = $filename;
-        }
-
-        FileApproval::create($validated);
-        return redirect()->back()->with('success', 'File berhasil disimpan.');
+    } else {
+        // Jika belum ada, buat baru
+        $fileApproval = FileApproval::create([
+            'id_pengajuan' => $validated['id_pengajuan'],
+            'nomor_surat' => $validated['nomor_surat'],
+        ]);
     }
+
+    // Ambil ulang pengajuan (dengan fileApproval terbaru)
+    $pengajuan = PengajuanSurat::with('fileApproval')->findOrFail($validated['id_pengajuan']);
+
+    // Generate dan simpan PDF
+    $pdfController = new PDFGeneratorController();
+    $response = $pdfController->generateAndStorePDF($pengajuan->id);
+
+    // Ambil nama file dari response JSON
+    $json = json_decode($response->getContent(), true);
+    if (!empty($json['filename'])) {
+        $fileApproval->update(['file_surat' => $json['filename']]);
+    }
+
+    return redirect()->back()->with('success', 'Nomor surat diset & file surat berhasil dibuat.');
+}
+
+
 
     public function update(Request $request, FileApproval $fileApproval)
     {

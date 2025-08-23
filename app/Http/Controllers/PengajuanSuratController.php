@@ -14,24 +14,35 @@ use Illuminate\Support\Facades\Auth;
 
 class PengajuanSuratController extends Controller
 {
-    public function create()
-    {
-        $jenisSurats = JenisSurat::with('fields')->get();
+public function create()
+{
+    $jenisSurats = JenisSurat::with('fields')->get();
 
-        // Get current user data
-        $currentUser = Auth::user();
-        $mahasiswa = Mahasiswa::where('user_id', $currentUser->id)->first();
+    // Get current user data
+    $currentUser = Auth::user();
+    $mahasiswa = Mahasiswa::where('user_id', $currentUser->id)->first();
 
-        $userData = [
-            'nama' => $currentUser->name,
-            'nim' => $currentUser->nomor_identifikasi,
-            'fakultas' => $mahasiswa->fakultas->nama ?? '',
-            'prodi' => $mahasiswa->prodi->nama ?? '',
-            'angkatan' => $mahasiswa->angkatan ?? ''
-        ];
+    $angkatan = $mahasiswa->angkatan ?? null;
+    $tahunSekarang = now()->year;
 
-        return view('pengajuan_surat.create', compact('jenisSurats', 'userData'));
+    // Filter jenis surat jika mahasiswa adalah maba (angkatan tahun ini)
+    if ($angkatan == $tahunSekarang) {
+        // Hilangkan jenis surat dengan ID 2
+        $jenisSurats = $jenisSurats->filter(function ($jenis) {
+            return $jenis->id != 2;
+        })->values(); // reset index agar tidak acak di view
     }
+
+    $userData = [
+        'nama' => $currentUser->name,
+        'nim' => $currentUser->nomor_identifikasi,
+        'fakultas' => $mahasiswa->fakultas->nama ?? '',
+        'prodi' => $mahasiswa->prodi->nama ?? '',
+        'angkatan' => $angkatan
+    ];
+
+    return view('pengajuan_surat.create', compact('jenisSurats', 'userData'));
+}
 
     public function store(Request $request)
     {

@@ -326,17 +326,6 @@
                                                                     <input type="text" class="form-control"
                                                                            name="nomor_surat" id="nomor_surat" required>
                                                                 </div>
-
-                                                                <div class="mb-3">
-                                                                    <label for="file_surat" class="form-label">
-                                                                        <i class="fas fa-upload me-1 text-success"></i>
-                                                                        Upload
-                                                                        Surat
-                                                                    </label>
-                                                                    <input type="file" class="form-control"
-                                                                           name="file_surat" id="file_surat"
-                                                                           accept=".pdf,.doc,.docx" required>
-                                                                </div>
                                                             </div>
 
                                                             <div class="modal-footer">
@@ -557,17 +546,6 @@
                                                                     </label>
                                                                     <input type="text" class="form-control"
                                                                            name="nomor_surat" id="nomor_surat" required>
-                                                                </div>
-
-                                                                <div class="mb-3">
-                                                                    <label for="file_surat" class="form-label">
-                                                                        <i class="fas fa-upload me-1 text-success"></i>
-                                                                        Upload
-                                                                        Surat
-                                                                    </label>
-                                                                    <input type="file" class="form-control"
-                                                                           name="file_surat" id="file_surat"
-                                                                           accept=".pdf,.doc,.docx" required>
                                                                 </div>
                                                             </div>
 

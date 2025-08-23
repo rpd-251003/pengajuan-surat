@@ -51,6 +51,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('preview-surat/{pengajuanId}', [PDFGeneratorController::class, 'previewSurat'])->name('preview.surat');
     Route::get('download-surat/{pengajuanId}', [PDFGeneratorController::class, 'downloadSurat'])->name('download.surat');
     Route::post('bulk-generate-pdf', [PDFGeneratorController::class, 'bulkGenerate'])->name('bulk.generate.pdf');
+    Route::post('/generate-surat-file/{pengajuanId}', [PDFGeneratorController::class, 'generateAndStorePDF']);
+
 
 });
 

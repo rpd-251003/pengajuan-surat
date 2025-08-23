@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class PDFGeneratorController extends Controller
 {
@@ -70,11 +72,13 @@ class PDFGeneratorController extends Controller
     public function downloadSurat($pengajuanId)
     {
         $pengajuan = PengajuanSurat::with([
-            'mahasiswa',
-            'jenisSurat.activeTemplate',
-            'details',
-            'mahasiswa.user'
-        ])->findOrFail($pengajuanId);
+    'mahasiswa',
+    'mahasiswa.user',
+    'jenisSurat.activeTemplate',
+    'details',
+    'fileApproval'
+])->findOrFail($pengajuanId);
+
 
         if (!$pengajuan->jenisSurat->activeTemplate) {
             abort(404, 'Template tidak ditemukan untuk jenis surat ini');
@@ -137,15 +141,88 @@ class PDFGeneratorController extends Controller
             ->header('Cache-Control', 'private, max-age=0, must-revalidate')
             ->header('Pragma', 'public');
     }
+    
+    public function generateAndStorePDF($pengajuanId)
+{
+    $pengajuan = PengajuanSurat::with([
+        'mahasiswa',
+        'mahasiswa.user',
+        'jenisSurat.activeTemplate',
+        'details',
+        'fileApproval'
+    ])->findOrFail($pengajuanId);
+
+    if (!$pengajuan->jenisSurat->activeTemplate) {
+        abort(404, 'Template tidak ditemukan untuk jenis surat ini');
+    }
+
+    $template = $pengajuan->jenisSurat->activeTemplate;
+    $data = $this->prepareTemplateData($pengajuan);
+    $htmlContent = $template->generateContent($data);
+
+    $staticHeader = '
+        <style>
+        @page {
+            margin: 15mm;
+        }
+        body {
+            transform: scale(0.8);
+            transform-origin: top left;
+            width: 125%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <div style="clear:both;">
+        <p style="margin-top:6pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:24pt;">
+            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65537;">
+                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="Logo" style="margin: 0 0 0 auto; display: block;">
+            </span>
+            <span style="height:0pt; margin-top:-6pt; text-align:left; display:block; position:absolute; z-index:-65534;">
+                <img src="https://r-code.online/img/unsada-logo.png" width="120" height="120" alt="" style="margin: 0 0 0 auto; display: block;">
+            </span>
+            <strong><span style="font-family:\'Times New Roman\';">UNIVERSITAS DARMA PERSADA</span></strong>
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            Jl. Taman Malaka Selatan Pondok Kelapa Jakarta 13450
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            Telp. 021 – 8649051, 8649053, 8649057 Fax. (021) 8649052
+        </p>
+        <p style="margin-top:0pt; margin-left:63.8pt; margin-bottom:0pt; text-align:center; line-height:normal; font-size:12pt;">
+            E-mail: humas@unsada.ac.id Home page: http://www.unsada.ac.id
+        </p>
+        <hr style="border: 1px solid #000; margin: 30px 0;">
+    </div>'; // (gunakan header HTML yang sama seperti di atas)
+
+    $fullTemplate = $template->getFullTemplate();
+    $finalContent = $staticHeader . str_replace($template->template_content, $htmlContent, $fullTemplate);
+
+    $pdf = $this->createPDF($finalContent, $template);
+
+    $filename = $this->generateFilename($pengajuan);
+
+
+    // Simpan ke storage
+    Storage::disk('public')->put($filename, $pdf->output());
+
+    return response()->json([
+        'success' => true,
+        'filename' => $filename
+    ]);
+}
+
 
     public function previewSurat($pengajuanId)
     {
         $pengajuan = PengajuanSurat::with([
-            'mahasiswa',
-            'jenisSurat.activeTemplate',
-            'details',
-            'mahasiswa.user'
-        ])->findOrFail($pengajuanId);
+    'mahasiswa',
+    'mahasiswa.user',
+    'jenisSurat.activeTemplate',
+    'details',
+    'fileApproval'
+])->findOrFail($pengajuanId);
+
 
         if (!$pengajuan->jenisSurat->activeTemplate) {
             return response()->json([
@@ -191,6 +268,8 @@ class PDFGeneratorController extends Controller
     private function prepareTemplateData($pengajuan)
     {
         // Base data
+        
+        
         
         \Log::debug('Data pengajuan yang diterima:', [
         'fileApproval' => $pengajuan->fileApproval,

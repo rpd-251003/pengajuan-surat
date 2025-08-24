@@ -770,7 +770,7 @@ public function create()
             9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
         ][intval(date('n'))];
 
-        // Ambil nomor terakhir di tahun berjalan
+        // Ambil nomor terakhir di tahun berjalan (global, semua jenis surat)
         $lastSurat = \App\Models\FileApproval::whereYear('created_at', $tahun)
             ->orderBy('id', 'desc')
             ->first();
@@ -784,7 +784,7 @@ public function create()
         // Nomor urut (4 digit)
         $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
-        // Format nomor surat
+        // Format nomor surat (beda format per jenis)
         switch ($jenisSurat) {
             case 'pengantar_kpta':
                 return "{$newNumber}/{$kode}/FT-WAKIL DEKAN 1/KP-TA/{$bulanRomawi}/{$tahun}";
@@ -793,9 +793,10 @@ public function create()
             case 'pengunduran_diri':
                 return "{$newNumber}/{$kode}/KAJUR-{$prodiKode}/{$bulanRomawi}/{$tahun}";
             default:
-                return "";
+                return "{$newNumber}/{$kode}/{$fakultasKode}/{$bulanRomawi}/{$tahun}";
         }
     }
+
 
 
     // ================= Dynamic Approval Methods =================

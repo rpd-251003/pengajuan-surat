@@ -105,7 +105,7 @@ public function create()
             $jenisSuratKey = $this->getJenisSuratKey($request->jenis_surat);
             $nomorSurat = $this->generateNomorSurat($jenisSuratKey, $prodiKode, 'FT');
 
-            \App\Models\FileApproval::create([
+            FileApproval::create([
                 'id_pengajuan' => $pengajuan->id,
                 'nomor_surat' => $nomorSurat,
             ]);
@@ -147,7 +147,7 @@ public function create()
     private function getJenisSuratKey($jenisSuratId)
     {
         switch ($jenisSuratId) {
-            case 1:
+            case 2:
                 return 'cuti';
             case 3:
                 return 'pengunduran_diri';

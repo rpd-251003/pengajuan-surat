@@ -108,7 +108,6 @@ public function create()
             \App\Models\FileApproval::create([
                 'id_pengajuan' => $pengajuan->id,
                 'nomor_surat' => $nomorSurat,
-                'status' => 'draft', // atau default sesuai kebutuhan
             ]);
 
             \Log::info('=== END PENGAJUAN SURAT SUCCESS ===');

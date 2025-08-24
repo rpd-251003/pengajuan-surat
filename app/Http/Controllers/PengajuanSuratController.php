@@ -47,7 +47,6 @@ public function create()
     public function store(Request $request)
     {
         try {
-            // Log untuk debug
             \Log::info('=== START PENGAJUAN SURAT ===');
             \Log::info('Request data', $request->all());
 
@@ -58,56 +57,30 @@ public function create()
 
             \Log::info('Validation passed');
 
-            // Validasi dynamic fields berdasarkan jenis surat
+            // Validasi dynamic fields
             $this->validateDynamicFields($request);
-
-            \Log::info('Dynamic fields validation passed');
 
             $mahasiswa = Mahasiswa::where('user_id', Auth::id())->first();
 
-            \Log::info('Mahasiswa found', $mahasiswa ? $mahasiswa->toArray() : ['mahasiswa' => 'NULL']);
-
             if (!$mahasiswa) {
-                \Log::error('Mahasiswa not found', ['user_id' => Auth::id()]);
                 return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
             }
 
-            // Cari Kaprodi berdasarkan tahun_angkatan dan prodi_id
             $kaprodi = DB::table('kaprodi_tahunans')
                 ->where('tahun_angkatan', $mahasiswa->angkatan)
                 ->where('prodi_id', $mahasiswa->prodi_id)
                 ->first();
 
-            \Log::info('Kaprodi search result', $kaprodi ? (array)$kaprodi : ['kaprodi' => 'NULL']);
-
-            // Cari Dosen PA berdasarkan tahun_angkatan dan prodi_id
             $dosenPa = DB::table('dosen_pa_tahunans')
                 ->where('tahun_angkatan', $mahasiswa->angkatan)
                 ->where('prodi_id', $mahasiswa->prodi_id)
                 ->first();
 
-            \Log::info('Dosen PA search result', $dosenPa ? (array)$dosenPa : ['dosen_pa' => 'NULL']);
-
-            // Validasi jika data kaprodi atau dosen PA tidak ditemukan
-            if (!$kaprodi) {
-                \Log::error('Kaprodi not found', [
-                    'angkatan' => $mahasiswa->angkatan,
-                    'prodi_id' => $mahasiswa->prodi_id
-                ]);
-                return redirect()->back()->with('error', 'Data Kaprodi untuk angkatan dan prodi Anda tidak ditemukan.');
+            if (!$kaprodi || !$dosenPa) {
+                return redirect()->back()->with('error', 'Data Kaprodi atau Dosen PA tidak ditemukan.');
             }
 
-            if (!$dosenPa) {
-                \Log::error('Dosen PA not found', [
-                    'angkatan' => $mahasiswa->angkatan,
-                    'prodi_id' => $mahasiswa->prodi_id
-                ]);
-                return redirect()->back()->with('error', 'Data Dosen PA untuk angkatan dan prodi Anda tidak ditemukan.');
-            }
-
-            \Log::info('Starting to create pengajuan...');
-
-            // Create pengajuan surat
+            // === Buat Pengajuan ===
             $pengajuan = PengajuanSurat::create([
                 'mahasiswa_id' => $mahasiswa->id,
                 'jenis_surat_id' => $request->jenis_surat,
@@ -119,27 +92,35 @@ public function create()
                 'approved_by_dosen_pa' => $dosenPa->user_id,
             ]);
 
-            \Log::info('Pengajuan created successfully', $pengajuan->toArray());
-
-            // Initialize dynamic approval flow
+            // Initialize approval flow
             $pengajuan->initializeApprovalFlow();
 
-            // Simpan detail pengajuan dengan auto fields
+            // Simpan detail
             $this->storeDetailsWithAutoFields($request, $pengajuan->id);
 
-            \Log::info('Details stored successfully');
+            // === Generate nomor surat untuk FileApproval ===
+            $prodi = \App\Models\Prodi::find($mahasiswa->prodi_id);
+            $prodiKode = $this->getProdiKode($prodi->nama); // fungsi helper singkatan prodi
+
+            $jenisSuratKey = $this->getJenisSuratKey($request->jenis_surat);
+            $nomorSurat = $this->generateNomorSurat($jenisSuratKey, $prodiKode, 'FT');
+
+            \App\Models\FileApproval::create([
+                'id_pengajuan' => $pengajuan->id,
+                'nomor_surat' => $nomorSurat,
+                'status' => 'draft', // atau default sesuai kebutuhan
+            ]);
+
             \Log::info('=== END PENGAJUAN SURAT SUCCESS ===');
 
             return redirect()->route('pengajuan_surat.history')->with('success', 'Pengajuan surat berhasil dikirim.');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation error in store', ['errors' => $e->errors()]);
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             \Log::error('Error in store pengajuan surat', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
             ]);
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
@@ -151,6 +132,36 @@ public function create()
     /**
      * Store pengajuan details with auto fields and file support
      */
+
+    private function getProdiKode($namaProdi)
+    {
+        // Ambil huruf pertama tiap kata
+        $words = explode(' ', $namaProdi);
+        $kode = '';
+        foreach ($words as $w) {
+            $kode .= strtoupper(substr($w, 0, 1));
+        }
+        return $kode;
+    }
+
+
+    private function getJenisSuratKey($jenisSuratId)
+    {
+        switch ($jenisSuratId) {
+            case 1:
+                return 'cuti';
+            case 3:
+                return 'pengunduran_diri';
+            case 5:
+            case 7:
+                return 'pengantar_kpta';
+            default:
+                return 'X'; // default unknown
+        }
+    }
+
+
+
     private function storeDetailsWithAutoFields(Request $request, $pengajuanId)
     {
         try {
@@ -742,6 +753,53 @@ public function create()
             return redirect()->back()->with('error', 'Terjadi kesalahan saat upload surat.');
         }
     }
+
+    private function generateNomorSurat($jenisSurat, $prodiKode = null, $fakultasKode = 'FT')
+    {
+        // Mapping kode jenis surat
+        $jenisMap = [
+            'pengantar_kpta'   => 'P',
+            'cuti'             => 'C',
+            'pengunduran_diri' => 'PD',
+        ];
+
+        $kode = $jenisMap[$jenisSurat] ?? 'X';
+
+        // Tahun & Bulan (Romawi)
+        $tahun = date('Y');
+        $bulanRomawi = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV',
+            5 => 'V', 6 => 'VI', 7 => 'VII', 8 => 'VIII',
+            9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ][intval(date('n'))];
+
+        // Ambil nomor terakhir di tahun berjalan
+        $lastSurat = \App\Models\FileApproval::whereYear('created_at', $tahun)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastSurat && preg_match('/^(\d{4})/', $lastSurat->nomor_surat, $matches)) {
+            $lastNumber = intval($matches[1]);
+        } else {
+            $lastNumber = 0;
+        }
+
+        // Nomor urut (4 digit)
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+
+        // Format nomor surat
+        switch ($jenisSurat) {
+            case 'pengantar_kpta':
+                return "{$newNumber}/{$kode}/FT-WAKIL DEKAN 1/KP-TA/{$bulanRomawi}/{$tahun}";
+            case 'cuti':
+                return "{$newNumber}/{$kode}/KAJUR-{$prodiKode}/{$bulanRomawi}/{$tahun}";
+            case 'pengunduran_diri':
+                return "{$newNumber}/{$kode}/KAJUR-{$prodiKode}/{$bulanRomawi}/{$tahun}";
+            default:
+                return "";
+        }
+    }
+
 
     // ================= Dynamic Approval Methods =================
 

@@ -160,8 +160,6 @@ public function create()
         }
     }
 
-
-
     private function storeDetailsWithAutoFields(Request $request, $pengajuanId)
     {
         try {
@@ -778,7 +776,7 @@ public function create()
             ->orderBy('id', 'desc')
             ->first();
 
-        if ($lastSurat && preg_match('/^(\d{4})/', $lastSurat->nomor_surat, $matches)) {
+        if ($lastSurat && preg_match('/^0*(\d+)/', $lastSurat->nomor_surat, $matches)) {
             $lastNumber = intval($matches[1]);
         } else {
             $lastNumber = 0;

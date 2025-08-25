@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mahasiswa;
+use App\Http\Controllers\Controller;
+use App\Models\FileApproval;
 use App\Models\JenisSurat;
-use Illuminate\Http\Request;
-use App\Models\PengajuanSurat;
+use App\Models\Mahasiswa;
 use App\Models\PengajuanDetail;
+use App\Models\PengajuanSurat;
+use App\Models\Prodi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class PengajuanSuratController extends Controller
 {

@@ -106,18 +106,23 @@
                                                             $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
                                                             $approvalHistory = $pengajuan->getApprovalHistory();
                                                         @endphp
-                                                        
-                                                        @foreach($approvalFlow as $index => $role)
+
+                                                        @foreach ($approvalFlow as $index => $role)
                                                             @php
-                                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
-                                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
-                                                                $approverName = $approvalHistory[$role]['approver_name'] ?? 'N/A';
+                                                                $roleDisplayName =
+                                                                    $availableRoles[$role] ??
+                                                                    ucfirst(str_replace('_', ' ', $role));
+                                                                $isApproved =
+                                                                    isset($approvalHistory[$role]) &&
+                                                                    $approvalHistory[$role]['approved_at'];
+                                                                $approverName =
+                                                                    $approvalHistory[$role]['approver_name'] ?? 'N/A';
                                                             @endphp
-                                                            
+
                                                             <!-- Role Step -->
                                                             <div class="text-center me-3">
                                                                 <div class="position-relative">
-                                                                    @if($isApproved)
+                                                                    @if ($isApproved)
                                                                         <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center"
                                                                             style="width: 12px; height: 12px;">
                                                                             <i class="fas fa-check text-white"
@@ -130,7 +135,7 @@
                                                                 </div>
                                                                 <small class="d-block mt-1" style="font-size: 10px;">
                                                                     {{ $roleDisplayName }}<br>
-                                                                    @if($isApproved)
+                                                                    @if ($isApproved)
                                                                         <span class="text-muted">{{ $approverName }}</span>
                                                                     @else
                                                                         <span class="text-warning">Waiting..</span>
@@ -139,7 +144,7 @@
                                                             </div>
 
                                                             <!-- Arrow (except for last item) -->
-                                                            @if($index < count($approvalFlow) - 1)
+                                                            @if ($index < count($approvalFlow) - 1)
                                                                 <i class="fas fa-arrow-right text-muted me-3"
                                                                     style="font-size: 10px;"></i>
                                                             @endif
@@ -152,8 +157,8 @@
                                                     @endphp
                                                     @if (!empty($details) || $pengajuan->keterangan)
                                                         <button type="button" class="btn btn-sm btn-info"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#detailModal{{ $pengajuan->id }}">
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#detailModal{{ $pengajuan->id }}">
                                                             <i class="fas fa-eye me-1"></i> Lihat Detail
                                                         </button>
                                                     @else
@@ -161,7 +166,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if ($pengajuan->fileApproval)
+                                                    @if ($pengajuan->fileApproval && $pengajuan->fileApproval->file_surat)
                                                         <div>
                                                             <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}"
                                                                 target="_blank" class="btn btn-sm btn-success">
@@ -217,18 +222,20 @@
                                         <div class="mb-2">
                                             <strong>Status:</strong>
                                             @php
-                                                $statusClass = match($pengajuan->status) {
+                                                $statusClass = match ($pengajuan->status) {
                                                     'diajukan' => 'bg-warning',
                                                     'diproses' => 'bg-primary',
                                                     'disetujui' => 'bg-success',
                                                     'ditolak' => 'bg-danger',
-                                                    default => 'bg-secondary'
+                                                    default => 'bg-secondary',
                                                 };
                                             @endphp
-                                            <span class="badge {{ $statusClass }}">{{ ucfirst($pengajuan->status) }}</span>
+                                            <span
+                                                class="badge {{ $statusClass }}">{{ ucfirst($pengajuan->status) }}</span>
                                         </div>
                                         <div class="mb-2">
-                                            <strong>Tanggal Pengajuan:</strong> {{ $pengajuan->created_at->format('d/m/Y H:i') }}
+                                            <strong>Tanggal Pengajuan:</strong>
+                                            {{ $pengajuan->created_at->format('d/m/Y H:i') }}
                                         </div>
                                         @if ($pengajuan->keterangan)
                                             <div class="mb-2">
@@ -250,19 +257,23 @@
                                             $availableRoles = $pengajuan->jenisSurat::getAvailableApprovalRoles();
                                             $approvalHistory = $pengajuan->getApprovalHistory();
                                         @endphp
-                                        
-                                        @foreach($approvalFlow as $index => $role)
+
+                                        @foreach ($approvalFlow as $index => $role)
                                             @php
-                                                $roleDisplayName = $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
-                                                $isApproved = isset($approvalHistory[$role]) && $approvalHistory[$role]['approved_at'];
-                                                $approverName = $approvalHistory[$role]['approver_name'] ?? 'Belum ditentukan';
+                                                $roleDisplayName =
+                                                    $availableRoles[$role] ?? ucfirst(str_replace('_', ' ', $role));
+                                                $isApproved =
+                                                    isset($approvalHistory[$role]) &&
+                                                    $approvalHistory[$role]['approved_at'];
+                                                $approverName =
+                                                    $approvalHistory[$role]['approver_name'] ?? 'Belum ditentukan';
                                                 $approvedAt = $approvalHistory[$role]['approved_at'] ?? null;
                                                 $isLastStep = $index === count($approvalFlow) - 1;
                                             @endphp
-                                            
+
                                             <!-- Role Step -->
                                             <div class="d-flex align-items-center {{ $isLastStep ? '' : 'mb-2' }}">
-                                                @if($isApproved)
+                                                @if ($isApproved)
                                                     <i class="fas fa-check-circle text-success me-2"></i>
                                                 @else
                                                     <i class="fas fa-clock text-warning me-2"></i>
@@ -270,14 +281,16 @@
                                                 <div>
                                                     <strong>{{ $roleDisplayName }}:</strong> {{ $approverName }}<br>
                                                     <small class="text-muted">
-                                                        @if($isApproved && $approvedAt)
-                                                            @if($isLastStep)
-                                                                Selesai: {{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}
+                                                        @if ($isApproved && $approvedAt)
+                                                            @if ($isLastStep)
+                                                                Selesai:
+                                                                {{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}
                                                             @else
-                                                                Disetujui: {{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}
+                                                                Disetujui:
+                                                                {{ \Carbon\Carbon::parse($approvedAt)->format('d/m/Y H:i') }}
                                                             @endif
                                                         @else
-                                                            @if($isLastStep)
+                                                            @if ($isLastStep)
                                                                 Menunggu pemrosesan
                                                             @else
                                                                 Menunggu persetujuan
@@ -309,39 +322,54 @@
                                             <div class="mt-1">
                                                 @if ($field->field_type === 'file')
                                                     @php
-                                                        $fileInfo = is_array($value) ? $value : json_decode($value, true);
+                                                        $fileInfo = is_array($value)
+                                                            ? $value
+                                                            : json_decode($value, true);
                                                     @endphp
                                                     @if ($fileInfo && isset($fileInfo['original_name']))
                                                         <div class="d-flex align-items-center p-2 border rounded bg-light">
                                                             <div class="me-2">
                                                                 @php
-                                                                    $ext = strtolower(pathinfo($fileInfo['original_name'], PATHINFO_EXTENSION));
-                                                                    $icon = match($ext) {
+                                                                    $ext = strtolower(
+                                                                        pathinfo(
+                                                                            $fileInfo['original_name'],
+                                                                            PATHINFO_EXTENSION,
+                                                                        ),
+                                                                    );
+                                                                    $icon = match ($ext) {
                                                                         'pdf' => 'fas fa-file-pdf text-danger',
-                                                                        'doc', 'docx' => 'fas fa-file-word text-primary',
-                                                                        'jpg', 'jpeg', 'png' => 'fas fa-file-image text-info',
-                                                                        default => 'fas fa-file text-secondary'
+                                                                        'doc',
+                                                                        'docx'
+                                                                            => 'fas fa-file-word text-primary',
+                                                                        'jpg',
+                                                                        'jpeg',
+                                                                        'png'
+                                                                            => 'fas fa-file-image text-info',
+                                                                        default => 'fas fa-file text-secondary',
                                                                     };
                                                                 @endphp
-                                                                <i class="{{ $icon }}" style="font-size: 1.5rem;"></i>
+                                                                <i class="{{ $icon }}"
+                                                                    style="font-size: 1.5rem;"></i>
                                                             </div>
                                                             <div class="flex-grow-1">
-                                                                <div class="fw-bold">{{ $fileInfo['original_name'] }}</div>
+                                                                <div class="fw-bold">{{ $fileInfo['original_name'] }}
+                                                                </div>
                                                                 <small class="text-muted">
                                                                     {{ number_format($fileInfo['size'] / 1024, 2) }} KB
-                                                                    • {{ \Carbon\Carbon::parse($fileInfo['uploaded_at'])->format('d/m/Y H:i') }}
+                                                                    •
+                                                                    {{ \Carbon\Carbon::parse($fileInfo['uploaded_at'])->format('d/m/Y H:i') }}
                                                                 </small>
                                                             </div>
                                                             <div>
                                                                 <a href="{{ route('pengajuan.file.view', [$pengajuan->id, $field->field_name]) }}"
-                                                                   target="_blank"
-                                                                   class="btn btn-sm btn-outline-primary me-1"
-                                                                   title="Buka file">
+                                                                    target="_blank"
+                                                                    class="btn btn-sm btn-outline-primary me-1"
+                                                                    title="Buka file">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                                 <a href="{{ route('pengajuan.file.download', [$pengajuan->id, $field->field_name]) }}"
-                                                                   class="btn btn-sm btn-outline-success"
-                                                                   title="Download">
+                                                                    class="btn btn-sm btn-outline-success"
+                                                                    title="Download">
                                                                     <i class="fas fa-download"></i>
                                                                 </a>
                                                             </div>
@@ -349,15 +377,20 @@
                                                     @endif
                                                 @elseif ($field->field_type === 'checkbox')
                                                     @php
-                                                        $selectedValues = is_string($value) ? json_decode($value, true) : $value;
-                                                        $selectedValues = is_array($selectedValues) ? $selectedValues : [$value];
+                                                        $selectedValues = is_string($value)
+                                                            ? json_decode($value, true)
+                                                            : $value;
+                                                        $selectedValues = is_array($selectedValues)
+                                                            ? $selectedValues
+                                                            : [$value];
                                                     @endphp
                                                     @if ($field->field_options)
                                                         <ul class="list-unstyled">
                                                             @foreach ($selectedValues as $selectedValue)
                                                                 @if (isset($field->field_options[$selectedValue]))
                                                                     <li>
-                                                                        <i class="fas fa-check-circle text-success me-1"></i>
+                                                                        <i
+                                                                            class="fas fa-check-circle text-success me-1"></i>
                                                                         {{ $field->field_options[$selectedValue] }}
                                                                     </li>
                                                                 @endif
@@ -365,7 +398,8 @@
                                                         </ul>
                                                     @endif
                                                 @elseif (in_array($field->field_type, ['select', 'radio']) && $field->field_options)
-                                                    <span class="badge bg-info">{{ $field->field_options[$value] ?? $value }}</span>
+                                                    <span
+                                                        class="badge bg-info">{{ $field->field_options[$value] ?? $value }}</span>
                                                 @elseif ($field->field_type === 'textarea')
                                                     <div class="bg-light p-2 rounded border">
                                                         {!! nl2br(e($value)) !!}
@@ -384,13 +418,13 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i>Tutup
                         </button>
-                        @if ($pengajuan->fileApproval)
-                            <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}"
-                               target="_blank"
-                               class="btn btn-success">
+                        @if ($pengajuan->fileApproval && $pengajuan->fileApproval->file_surat)
+                            <a href="{{ asset('storage/' . $pengajuan->fileApproval->file_surat) }}" target="_blank"
+                                class="btn btn-success">
                                 <i class="fas fa-download me-1"></i>Download Surat Final
                             </a>
                         @endif
+
                     </div>
                 </div>
             </div>
@@ -439,7 +473,7 @@
 
             .file-attachment:hover {
                 transform: translateY(-1px);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
 
             /* Modal responsive */
